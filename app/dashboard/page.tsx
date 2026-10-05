@@ -10,10 +10,8 @@ import {
   Scale,
   Receipt,
   ArrowRight,
-  ArrowDownRight,
   ArrowUpRight,
   ArrowLeftRight,
-  PlusCircle,
 } from "lucide-react";
 import { CategoryDonutChart } from "@/components/charts/CategoryDonutChart";
 import { MonthlyTrendChart } from "@/components/charts/MonthlyTrendChart";

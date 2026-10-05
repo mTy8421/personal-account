@@ -22,6 +22,8 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { CategoryIcon } from "@/components/ui/CategoryIcon";
+import { ModalWrapper } from "@/components/ui/ModalWrapper";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 
 interface RecurringClientProps {
   recurringExpenses: RecurringExpenseData[];
@@ -49,6 +51,19 @@ export function RecurringClient({
   const [loading, setLoading] = useState(false);
   const [processingId, setProcessingId] = useState<string | null>(null);
   const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
+
+  const showFeedback = (msg: string, isError = false) => {
+    if (isError) {
+      setError(msg);
+      setTimeout(() => setError(""), 5000);
+    } else {
+      setMessage(msg);
+      setTimeout(() => setMessage(""), 4000);
+    }
+  };
 
   const handleOpenAdd = (item?: RecurringExpenseData) => {
     if (item) {
@@ -70,6 +85,7 @@ export function RecurringClient({
       setDayOfMonth("1");
       setNextDueDate(toInputDateFormat());
     }
+    setError("");
     setModalOpen(true);
   };
 
@@ -79,6 +95,7 @@ export function RecurringClient({
     if (!name.trim() || isNaN(numAmount) || numAmount <= 0) return;
 
     setLoading(true);
+    setError("");
     try {
       if (editingItem) {
         await updateRecurringExpense(editingItem.id, {
@@ -90,6 +107,7 @@ export function RecurringClient({
           dayOfMonth: parseInt(dayOfMonth, 10),
           nextDueDate: new Date(nextDueDate),
         });
+        showFeedback("บันทึกการแก้ไขรายการประจำเรียบร้อยแล้ว");
       } else {
         await createRecurringExpense({
           name: name.trim(),
@@ -100,23 +118,29 @@ export function RecurringClient({
           dayOfMonth: parseInt(dayOfMonth, 10),
           nextDueDate: new Date(nextDueDate),
         });
+        showFeedback("เพิ่มรายการประจำใหม่เรียบร้อยแล้ว");
       }
       setModalOpen(false);
       router.refresh();
     } catch (err: any) {
-      alert(err.message || "เกิดข้อผิดพลาด");
+      setError(err.message || "เกิดข้อผิดพลาดในการบันทึก");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("คุณต้องการลบรายการประจำนี้หรือไม่?")) return;
+  const handleConfirmDelete = async () => {
+    if (!deleteId) return;
+    setDeleting(true);
     try {
-      await deleteRecurringExpense(id);
+      await deleteRecurringExpense(deleteId);
+      setDeleteId(null);
+      showFeedback("ลบรายการประจำเรียบร้อยแล้ว");
       router.refresh();
     } catch {
-      alert("ไม่สามารถลบได้");
+      showFeedback("ไม่สามารถลบได้", true);
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -124,11 +148,10 @@ export function RecurringClient({
     setProcessingId(id);
     try {
       await processRecurringExpense(id);
-      setMessage("บันทึกธุรกรรมและเลื่อนวันครบกำหนดเรียบร้อยแล้ว!");
+      showFeedback("บันทึกธุรกรรมและเลื่อนวันครบกำหนดเรียบร้อยแล้ว!");
       router.refresh();
-      setTimeout(() => setMessage(""), 4000);
     } catch (err: any) {
-      alert(err.message || "ไม่สามารถบันทึกรายการได้");
+      showFeedback(err.message || "ไม่สามารถบันทึกรายการได้", true);
     } finally {
       setProcessingId(null);
     }
@@ -162,6 +185,13 @@ export function RecurringClient({
         <div className="flex items-center gap-2 rounded-xl bg-success-subtle p-3 text-xs font-semibold text-success-text border border-success/30">
           <CheckCircle2 className="h-4 w-4 shrink-0" />
           {message}
+        </div>
+      )}
+
+      {error && (
+        <div className="flex items-center gap-2 rounded-xl bg-danger-subtle p-3 text-xs font-semibold text-danger-text border border-danger/30">
+          <AlertCircle className="h-4 w-4 shrink-0" />
+          {error}
         </div>
       )}
 
@@ -217,16 +247,20 @@ export function RecurringClient({
 
                     <div className="flex items-center gap-1">
                       <button
+                        type="button"
                         onClick={() => handleOpenAdd(item)}
-                        className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground transition"
+                        className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition"
                         title="แก้ไข"
+                        aria-label="แก้ไขรายการประจำ"
                       >
                         <Edit2 className="h-3.5 w-3.5" />
                       </button>
                       <button
-                        onClick={() => handleDelete(item.id)}
-                        className="rounded-lg p-1.5 text-muted-foreground hover:bg-danger-subtle hover:text-danger transition"
+                        type="button"
+                        onClick={() => setDeleteId(item.id)}
+                        className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-danger-subtle hover:text-danger transition"
                         title="ลบ"
+                        aria-label="ลบรายการประจำ"
                       >
                         <Trash2 className="h-3.5 w-3.5" />
                       </button>
@@ -281,22 +315,32 @@ export function RecurringClient({
       )}
 
       {/* Add / Edit Modal */}
-      {modalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 overflow-y-auto">
-          <div className="w-full max-w-md rounded-2xl bg-card p-6 shadow-2xl border border-border my-8">
-            <div className="flex items-center justify-between border-b border-border pb-3">
-              <h2 className="text-base font-bold text-foreground">
-                {editingItem ? "แก้ไขรายการประจำ" : "เพิ่มรายการค่าใช้จ่ายประจำ"}
-              </h2>
-              <button
-                onClick={() => setModalOpen(false)}
-                className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground transition"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
+      <ModalWrapper
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        ariaLabel={editingItem ? "แก้ไขรายการประจำ" : "เพิ่มรายการค่าใช้จ่ายประจำ"}
+      >
+        <div className="w-full max-w-md rounded-2xl bg-card p-6 shadow-2xl border border-border my-8">
+          <div className="flex items-center justify-between border-b border-border pb-3">
+            <h2 className="text-base font-bold text-foreground">
+              {editingItem ? "แก้ไขรายการประจำ" : "เพิ่มรายการค่าใช้จ่ายประจำ"}
+            </h2>
+            <button
+              type="button"
+              onClick={() => setModalOpen(false)}
+              className="rounded-lg p-2 text-muted-foreground hover:bg-muted hover:text-foreground transition"
+              aria-label="ปิดหน้าต่าง"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
 
-            <form onSubmit={handleSave} className="mt-4 space-y-4">
+          <form onSubmit={handleSave} className="mt-4 space-y-4">
+            {error && (
+              <div className="rounded-xl bg-danger-subtle p-2.5 text-xs font-semibold text-danger-text border border-danger/30">
+                {error}
+              </div>
+            )}
               <div>
                 <label className="block text-xs font-medium text-muted-foreground">
                   ชื่อรายการประจำ *
@@ -429,8 +473,19 @@ export function RecurringClient({
               </div>
             </form>
           </div>
-        </div>
-      )}
+      </ModalWrapper>
+
+      {/* Accessible Delete Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={Boolean(deleteId)}
+        onClose={() => setDeleteId(null)}
+        onConfirm={handleConfirmDelete}
+        loading={deleting}
+        title="ยืนยันการลบรายการประจำ?"
+        message="การลบรายการนี้จะไม่ส่งผลต่อประวัติธุรกรรมที่เคยถูกบันทึกไปแล้วในระบบ"
+        confirmLabel="ลบรายการ"
+        variant="danger"
+      />
     </div>
   );
 }

@@ -8,8 +8,6 @@ import { deleteTransaction } from "@/lib/actions/transactions";
 import { AccountData, CategoryData, TransactionData } from "@/lib/types";
 import {
   Search,
-  Filter,
-  ArrowDownRight,
   ArrowUpRight,
   ArrowLeftRight,
   Edit2,
@@ -18,9 +16,10 @@ import {
   ChevronLeft,
   ChevronRight,
   Plus,
-  AlertTriangle,
+  X,
 } from "lucide-react";
 import { TransactionDialog } from "@/components/transactions/TransactionDialog";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { CategoryIcon } from "@/components/ui/CategoryIcon";
 
 interface TransactionsClientProps {
@@ -99,8 +98,8 @@ export function TransactionsClient({
       await deleteTransaction(deleteId);
       setDeleteId(null);
       router.refresh();
-    } catch (err) {
-      alert("ไม่สามารถลบรายการได้");
+    } catch {
+      // deletion error handled quietly
     } finally {
       setDeleting(false);
     }
@@ -162,7 +161,7 @@ export function TransactionsClient({
           </button>
         </form>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2 border-t border-border text-xs">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 pt-2 border-t border-border text-xs">
           {/* ประเภท */}
           <div>
             <label className="text-[11px] font-medium text-muted-foreground">ประเภท</label>
@@ -234,7 +233,42 @@ export function TransactionsClient({
               className="mt-1 w-full rounded-lg border border-border bg-card p-1.5 font-medium text-foreground focus:border-primary focus:outline-hidden"
             />
           </div>
+
+          {/* วันที่สิ้นสุด */}
+          <div>
+            <label className="text-[11px] font-medium text-muted-foreground">ถึงวันที่</label>
+            <input
+              type="date"
+              value={endDate}
+              onChange={(e) => {
+                setEndDate(e.target.value);
+                applyFilters({ endDate: e.target.value });
+              }}
+              className="mt-1 w-full rounded-lg border border-border bg-card p-1.5 font-medium text-foreground focus:border-primary focus:outline-hidden"
+            />
+          </div>
         </div>
+
+        {(search || type !== "ALL" || accountId !== "ALL" || categoryId !== "ALL" || startDate || endDate) && (
+          <div className="flex items-center justify-between pt-1 text-xs">
+            <span className="text-muted-foreground text-[11px]">กำลังกรองข้อมูล</span>
+            <button
+              type="button"
+              onClick={() => {
+                setSearch("");
+                setType("ALL");
+                setAccountId("ALL");
+                setCategoryId("ALL");
+                setStartDate("");
+                setEndDate("");
+                router.push("/transactions");
+              }}
+              className="inline-flex items-center gap-1 text-[11px] font-semibold text-danger hover:underline"
+            >
+              <X className="h-3 w-3" /> ล้างตัวกรองทั้งหมด
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Transaction Table / List */}
@@ -245,7 +279,115 @@ export function TransactionsClient({
           </div>
         ) : (
           <>
-            <div className="overflow-x-auto">
+            {/* Mobile Card List (Screen < sm) */}
+            <div className="block sm:hidden divide-y divide-border/60">
+              {initialTransactions.map((tx) => {
+                const isIncome = tx.type === "INCOME";
+                const isTransfer = tx.type === "TRANSFER";
+
+                return (
+                  <div key={tx.id} className="p-3.5 space-y-2">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <div
+                          className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-white shadow-xs ${
+                            isTransfer
+                              ? "bg-primary"
+                              : isIncome
+                              ? "bg-success"
+                              : "bg-danger"
+                          }`}
+                        >
+                          {isTransfer ? (
+                            <ArrowLeftRight className="h-4 w-4" />
+                          ) : isIncome ? (
+                            <ArrowUpRight className="h-4 w-4" />
+                          ) : (
+                            <CategoryIcon
+                              name={tx.category?.icon || "Utensils"}
+                              className="h-4 w-4 text-white"
+                            />
+                          )}
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-xs font-bold text-foreground truncate">
+                            {isTransfer
+                              ? `โอน: ${tx.account?.name} → ${tx.toAccount?.name}`
+                              : tx.note || tx.category?.name || "ไม่ระบุ"}
+                          </p>
+                          <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground mt-0.5">
+                            <span>{formatThaiDate(tx.date)}</span>
+                            <span>•</span>
+                            <span className="truncate">{tx.account?.name}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="text-right shrink-0">
+                        <p
+                          className={`text-sm font-black whitespace-nowrap ${
+                            isTransfer
+                              ? "text-primary dark:text-primary-foreground"
+                              : isIncome
+                              ? "text-success-text dark:text-success"
+                              : "text-danger"
+                          }`}
+                        >
+                          {isTransfer ? "" : isIncome ? "+" : "-"}
+                          {formatCurrency(tx.amount)}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between pt-1">
+                      <div>
+                        {tx.category ? (
+                          <span
+                            className="inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[10px] font-semibold"
+                            style={{
+                              backgroundColor: `${tx.category.color}20`,
+                              color: tx.category.color,
+                            }}
+                          >
+                            <CategoryIcon name={tx.category.icon} size={12} />
+                            {tx.category.name}
+                          </span>
+                        ) : isTransfer ? (
+                          <span className="text-[10px] text-muted-foreground">โอนเงินระหว่างบัญชี</span>
+                        ) : null}
+                      </div>
+
+                      <div className="flex items-center gap-1">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setEditingTx(tx);
+                            setDialogOpen(true);
+                          }}
+                          className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition"
+                          title="แก้ไขรายการ"
+                          aria-label="แก้ไขรายการ"
+                        >
+                          <Edit2 className="h-4 w-4" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setDeleteId(tx.id)}
+                          className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-danger-subtle hover:text-danger transition"
+                          title="ลบรายการ"
+                          aria-label="ลบรายการ"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Desktop / Tablet Table (Screen >= sm) */}
+            <div className="hidden sm:block overflow-x-auto">
               <table className="w-full text-left text-xs">
                 <thead className="bg-muted/50 border-b border-border text-muted-foreground">
                   <tr>
@@ -311,19 +453,23 @@ export function TransactionsClient({
                         <td className="py-3 px-4 text-center whitespace-nowrap">
                           <div className="flex items-center justify-center gap-1">
                             <button
+                              type="button"
                               onClick={() => {
                                 setEditingTx(tx);
                                 setDialogOpen(true);
                               }}
-                              className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground transition"
+                              className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition"
                               title="แก้ไขรายการ"
+                              aria-label="แก้ไขรายการ"
                             >
                               <Edit2 className="h-4 w-4" />
                             </button>
                             <button
+                              type="button"
                               onClick={() => setDeleteId(tx.id)}
-                              className="rounded-lg p-1.5 text-muted-foreground hover:bg-danger-subtle hover:text-danger transition"
+                              className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-danger-subtle hover:text-danger transition"
                               title="ลบรายการ"
+                              aria-label="ลบรายการ"
                             >
                               <Trash2 className="h-4 w-4" />
                             </button>
@@ -348,6 +494,7 @@ export function TransactionsClient({
                     disabled={currentPage <= 1}
                     onClick={() => handlePageChange(currentPage - 1)}
                     className="flex h-8 w-8 items-center justify-center rounded-lg border border-border text-foreground hover:bg-muted disabled:opacity-40 transition"
+                    aria-label="หน้าก่อนหน้า"
                   >
                     <ChevronLeft className="h-4 w-4" />
                   </button>
@@ -355,6 +502,7 @@ export function TransactionsClient({
                     disabled={currentPage >= totalPages}
                     onClick={() => handlePageChange(currentPage + 1)}
                     className="flex h-8 w-8 items-center justify-center rounded-lg border border-border text-foreground hover:bg-muted disabled:opacity-40 transition"
+                    aria-label="หน้าถัดไป"
                   >
                     <ChevronRight className="h-4 w-4" />
                   </button>
@@ -378,37 +526,17 @@ export function TransactionsClient({
         }}
       />
 
-      {/* Delete Confirmation Modal */}
-      {deleteId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-          <div className="w-full max-w-sm rounded-2xl bg-card p-6 shadow-xl border border-border text-center">
-            <AlertTriangle className="mx-auto mb-3 h-10 w-10 text-danger" />
-            <h3 className="text-base font-bold text-foreground">
-              ยืนยันการลบรายการ?
-            </h3>
-            <p className="mt-2 text-xs text-muted-foreground">
-              ยอดเงินในบัญชีที่เกี่ยวข้องจะถูกปรับปรุงย้อนกลับโดยอัตโนมัติ
-            </p>
-            <div className="mt-5 flex gap-2">
-              <button
-                type="button"
-                onClick={() => setDeleteId(null)}
-                className="flex-1 rounded-xl border border-border py-2.5 text-xs font-semibold text-foreground hover:bg-muted transition"
-              >
-                ยกเลิก
-              </button>
-              <button
-                type="button"
-                disabled={deleting}
-                onClick={handleDelete}
-                className="flex-1 rounded-xl bg-danger py-2.5 text-xs font-semibold text-white hover:bg-danger-hover disabled:opacity-50 transition"
-              >
-                {deleting ? "กำลังลบ..." : "ลบรายการ"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Accessible Delete Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={Boolean(deleteId)}
+        onClose={() => setDeleteId(null)}
+        onConfirm={handleDelete}
+        loading={deleting}
+        title="ยืนยันการลบรายการ?"
+        message="ยอดเงินในบัญชีที่เกี่ยวข้องจะถูกปรับปรุงย้อนกลับโดยอัตโนมัติ"
+        confirmLabel="ลบรายการ"
+        variant="danger"
+      />
     </div>
   );
 }

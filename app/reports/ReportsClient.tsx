@@ -5,14 +5,8 @@ import { useRouter } from "next/navigation";
 import { formatCurrency } from "@/lib/utils/currency";
 import { formatThaiMonthYear } from "@/lib/utils/date";
 import {
-  TrendingUp,
-  TrendingDown,
-  Scale,
-  Calendar,
   ChevronLeft,
   ChevronRight,
-  PieChart as PieIcon,
-  BarChart2,
 } from "lucide-react";
 import { CategoryDonutChart } from "@/components/charts/CategoryDonutChart";
 import { DailyExpenseChart } from "@/components/charts/DailyExpenseChart";
@@ -282,6 +276,25 @@ export function ReportsClient({
                     </tr>
                   ))}
                 </tbody>
+                <tfoot className="bg-muted/70 border-t-2 border-border font-bold">
+                  <tr>
+                    <td className="py-3 px-4 text-foreground font-bold">รวมทั้งปี ({year})</td>
+                    <td className="py-3 px-4 text-right font-bold text-success-text dark:text-success">
+                      +{formatCurrency(yearlyData.totalIncome)}
+                    </td>
+                    <td className="py-3 px-4 text-right font-bold text-danger">
+                      -{formatCurrency(yearlyData.totalExpense)}
+                    </td>
+                    <td
+                      className={`py-3 px-4 text-right font-bold ${
+                        yearlyData.netBalance >= 0 ? "text-success-text dark:text-success" : "text-danger"
+                      }`}
+                    >
+                      {yearlyData.netBalance >= 0 ? "+" : ""}
+                      {formatCurrency(yearlyData.netBalance)}
+                    </td>
+                  </tr>
+                </tfoot>
               </table>
             </div>
           </div>

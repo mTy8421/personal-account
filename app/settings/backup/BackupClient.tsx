@@ -13,6 +13,7 @@ import {
   Clock,
   ShieldCheck,
 } from "lucide-react";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 
 interface BackupClientProps {
   lastBackupAt?: Date | null;
@@ -24,6 +25,16 @@ export function BackupClient({ lastBackupAt }: BackupClientProps) {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+
+  const showFeedback = (msg: string, isError = false) => {
+    if (isError) {
+      setError(msg);
+      setTimeout(() => setError(""), 6000);
+    } else {
+      setMessage(msg);
+      setTimeout(() => setMessage(""), 5000);
+    }
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -59,7 +70,7 @@ export function BackupClient({ lastBackupAt }: BackupClientProps) {
         throw new Error(data.error || "เกิดข้อผิดพลาดในการกู้คืนข้อมูล");
       }
 
-      setMessage(data.message || "กู้คืนข้อมูลเรียบร้อยแล้ว");
+      showFeedback(data.message || "กู้คืนข้อมูลเรียบร้อยแล้ว");
       setShowConfirmModal(false);
       setSelectedFile(null);
 
@@ -67,7 +78,7 @@ export function BackupClient({ lastBackupAt }: BackupClientProps) {
         window.location.reload();
       }, 1500);
     } catch (err: any) {
-      setError(err.message || "การกู้คืนข้อมูลล้มเหลว");
+      showFeedback(err.message || "การกู้คืนข้อมูลล้มเหลว", true);
       setShowConfirmModal(false);
     } finally {
       setLoading(false);
@@ -256,44 +267,16 @@ export function BackupClient({ lastBackupAt }: BackupClientProps) {
       </div>
 
       {/* Confirmation Modal */}
-      {showConfirmModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-xs p-4">
-          <div className="w-full max-w-md rounded-2xl bg-card p-6 shadow-2xl border border-border text-center">
-            <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-danger-subtle text-danger">
-              <AlertTriangle className="h-6 w-6" />
-            </div>
-
-            <h3 className="text-lg font-bold text-foreground">
-              คำเตือน
-            </h3>
-            <p className="mt-2 text-sm text-foreground font-semibold">
-              การ Restore จะเขียนทับข้อมูลปัจจุบัน
-            </p>
-            <p className="mt-1 text-xs text-muted-foreground">
-              ข้อมูลปัจจุบันทั้งหมดจะถูกแทนที่ด้วยข้อมูลจากไฟล์: <strong>{selectedFile?.name}</strong>
-              <br />ต้องการดำเนินการต่อหรือไม่?
-            </p>
-
-            <div className="mt-6 flex gap-3">
-              <button
-                type="button"
-                onClick={() => setShowConfirmModal(false)}
-                className="flex-1 rounded-xl border border-border py-2.5 text-xs font-semibold text-foreground hover:bg-muted transition"
-              >
-                ยกเลิก
-              </button>
-              <button
-                type="button"
-                disabled={loading}
-                onClick={handleConfirmRestore}
-                className="flex-1 rounded-xl bg-danger py-2.5 text-xs font-semibold text-white hover:bg-danger-hover disabled:opacity-50 transition"
-              >
-                {loading ? "กำลังดำเนินการ..." : "ยืนยัน Restore"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ConfirmDialog
+        isOpen={showConfirmModal}
+        title="คำเตือน: การ Restore จะเขียนทับข้อมูลปัจจุบัน"
+        message={`ข้อมูลปัจจุบันทั้งหมดจะถูกแทนที่ด้วยข้อมูลจากไฟล์: ${selectedFile?.name || ""}\n\nคุณแน่ใจหรือไม่ว่าต้องการดำเนินการต่อ?`}
+        confirmText={loading ? "กำลังดำเนินการ..." : "ยืนยัน Restore"}
+        cancelText="ยกเลิก"
+        variant="danger"
+        onConfirm={handleConfirmRestore}
+        onClose={() => setShowConfirmModal(false)}
+      />
     </div>
   );
 }

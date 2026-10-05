@@ -49,12 +49,12 @@ export function DailyExpenseChart({ data }: DailyExpenseChartProps) {
         <BarChart data={data} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
           <XAxis
             dataKey="day"
-            tick={{ fontSize: 10, fill: "#888888" }}
+            tick={{ fontSize: 10, fill: "var(--color-muted-foreground)" }}
             axisLine={false}
             tickLine={false}
           />
           <YAxis
-            tick={{ fontSize: 10, fill: "#888888" }}
+            tick={{ fontSize: 10, fill: "var(--color-muted-foreground)" }}
             axisLine={false}
             tickLine={false}
             tickFormatter={(val) => `${val >= 1000 ? `${(val / 1000).toFixed(0)}k` : val}`}

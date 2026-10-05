@@ -85,7 +85,10 @@ export function CategoryDonutChart({ data }: CategoryDonutChartProps) {
                 className="h-3 w-3 rounded-full shrink-0"
                 style={{ backgroundColor: item.color || "#2A9D8F" }}
               />
-              <span className="text-xs font-medium text-foreground truncate max-w-[120px]">
+              <span
+                className="text-xs font-medium text-foreground truncate max-w-[120px]"
+                title={item.categoryName}
+              >
                 {item.categoryName}
               </span>
             </div>

@@ -79,6 +79,7 @@ export function MobileNav({ onOpenNewTransaction }: MobileNavProps) {
           onClick={onOpenNewTransaction}
           className="flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-xl transition active:scale-95 hover:bg-primary-hover focus:outline-hidden focus:ring-2 focus:ring-primary focus:ring-offset-2"
           aria-label="เพิ่มรายการด่วน"
+          title="เพิ่มรายการด่วน (Quick Add)"
         >
           <Plus className="h-7 w-7" />
         </button>
@@ -88,7 +89,10 @@ export function MobileNav({ onOpenNewTransaction }: MobileNavProps) {
       <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-30 flex h-16 items-center justify-around border-t border-border bg-card/95 backdrop-blur-md px-2">
         {primaryTabs.map((tab) => {
           const Icon = tab.icon;
-          const isActive = pathname === tab.href;
+          const isActive =
+            tab.href === "/dashboard"
+              ? pathname === "/dashboard"
+              : pathname.startsWith(tab.href);
           return (
             <Link
               key={tab.href}
@@ -110,15 +114,16 @@ export function MobileNav({ onOpenNewTransaction }: MobileNavProps) {
       {drawerOpen && (
         <div className="fixed inset-0 z-50 flex">
           <div
-            className="fixed inset-0 bg-black/60 backdrop-blur-xs"
+            className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity"
             onClick={() => setDrawerOpen(false)}
           />
-          <div className="relative ml-auto flex h-full w-72 flex-col bg-card p-5 shadow-2xl border-l border-border">
+          <div className="relative ml-auto flex h-full w-72 flex-col bg-card p-5 shadow-2xl border-l border-border transition-transform duration-300 ease-out animate-in slide-in-from-right">
             <div className="flex items-center justify-between border-b border-border pb-3">
               <span className="font-bold text-foreground">เมนูเพิ่มเติม</span>
               <button
                 onClick={() => setDrawerOpen(false)}
                 className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground"
+                aria-label="ปิดเมนู"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -127,7 +132,10 @@ export function MobileNav({ onOpenNewTransaction }: MobileNavProps) {
             <nav className="mt-4 flex-1 space-y-1">
               {drawerLinks.map((link) => {
                 const Icon = link.icon;
-                const isActive = pathname === link.href;
+                const isActive =
+                  link.href === "/settings"
+                    ? pathname === "/settings"
+                    : pathname.startsWith(link.href);
                 return (
                   <Link
                     key={link.href}

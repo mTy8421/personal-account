@@ -14,11 +14,10 @@ import {
   Trash2,
   CheckCircle2,
   X,
-  CreditCard,
-  Building2,
-  Banknote,
 } from "lucide-react";
 import { AccountIcon } from "@/components/ui/AccountIcon";
+import { ModalWrapper } from "@/components/ui/ModalWrapper";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 
 interface AccountsClientProps {
   accounts: AccountData[];
@@ -37,15 +36,28 @@ export function AccountsClient({ accounts }: AccountsClientProps) {
   const [loading, setLoading] = useState(false);
   const [reconciling, setReconciling] = useState(false);
   const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
+
+  const showFeedback = (msg: string, isError = false) => {
+    if (isError) {
+      setError(msg);
+      setTimeout(() => setError(""), 5000);
+    } else {
+      setMessage(msg);
+      setTimeout(() => setMessage(""), 4000);
+    }
+  };
 
   const handleOpenAdd = () => {
     setEditingAcc(null);
     setName("");
     setType("BANK");
     setInitialBalance("0");
-    setColor("#3b82f6");
+    setColor("#083D77");
+    setError("");
     setModalOpen(true);
-    setMessage("");
   };
 
   const handleOpenEdit = (acc: AccountData) => {
@@ -53,9 +65,9 @@ export function AccountsClient({ accounts }: AccountsClientProps) {
     setName(acc.name);
     setType(acc.type);
     setInitialBalance(String(acc.initialBalance));
-    setColor(acc.color || "#3b82f6");
+    setColor(acc.color || "#083D77");
+    setError("");
     setModalOpen(true);
-    setMessage("");
   };
 
   const handleSave = async (e: React.FormEvent) => {
@@ -63,6 +75,7 @@ export function AccountsClient({ accounts }: AccountsClientProps) {
     if (!name.trim()) return;
 
     setLoading(true);
+    setError("");
     try {
       if (editingAcc) {
         await updateAccount(editingAcc.id, {
@@ -71,6 +84,7 @@ export function AccountsClient({ accounts }: AccountsClientProps) {
           initialBalance: parseFloat(initialBalance) || 0,
           color,
         });
+        showFeedback("บันทึกการแก้ไขบัญชีเรียบร้อยแล้ว");
       } else {
         await createAccount({
           name: name.trim(),
@@ -78,23 +92,29 @@ export function AccountsClient({ accounts }: AccountsClientProps) {
           initialBalance: parseFloat(initialBalance) || 0,
           color,
         });
+        showFeedback("เพิ่มบัญชีใหม่เรียบร้อยแล้ว");
       }
       setModalOpen(false);
       router.refresh();
     } catch (err: any) {
-      alert(err.message || "เกิดข้อผิดพลาด");
+      setError(err.message || "เกิดข้อผิดพลาดในการบันทึก");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("คุณต้องการลบ/ระงับบัญชีนี้หรือไม่?")) return;
+  const handleConfirmDelete = async () => {
+    if (!deleteId) return;
+    setDeleting(true);
     try {
-      await deleteAccount(id);
+      await deleteAccount(deleteId);
+      setDeleteId(null);
+      showFeedback("ลบ/ระงับบัญชีเรียบร้อยแล้ว");
       router.refresh();
     } catch {
-      alert("ไม่สามารถลบบัญชีได้");
+      showFeedback("ไม่สามารถลบบัญชีได้", true);
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -102,11 +122,10 @@ export function AccountsClient({ accounts }: AccountsClientProps) {
     setReconciling(true);
     try {
       await reconcileAllAccounts();
-      setMessage("ปรับปรุงยอดเงินทุกบัญชีเรียบร้อยแล้ว ข้อมูลตรง 100%");
+      showFeedback("ปรับปรุงยอดเงินทุกบัญชีเรียบร้อยแล้ว ข้อมูลตรง 100%");
       router.refresh();
-      setTimeout(() => setMessage(""), 4000);
     } catch {
-      alert("เกิดข้อผิดพลาดในการ Reconcile");
+      showFeedback("เกิดข้อผิดพลาดในการ Reconcile", true);
     } finally {
       setReconciling(false);
     }
@@ -165,182 +184,245 @@ export function AccountsClient({ accounts }: AccountsClientProps) {
         </div>
       )}
 
-      {/* Account Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-        {accounts.map((acc) => (
-          <div
-            key={acc.id}
-            className="flex flex-col justify-between rounded-2xl border border-border bg-card p-5 shadow-xs relative overflow-hidden"
-          >
-            {/* Top color bar indicator */}
-            <div
-              className="absolute top-0 left-0 right-0 h-1.5"
-              style={{ backgroundColor: acc.color || "#083D77" }}
-            />
-
-            <div>
-              <div className="flex items-start justify-between">
-                <div className="flex items-center gap-3">
-                  <div
-                    className="flex h-11 w-11 items-center justify-center rounded-xl text-white shadow-xs"
-                    style={{ backgroundColor: acc.color || "#083D77" }}
-                  >
-                    <AccountIcon type={acc.type} size={22} />
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-bold text-foreground">
-                      {acc.name}
-                    </h3>
-                    <span className="text-[11px] text-muted-foreground">
-                      {acc.type === "CASH"
-                        ? "เงินสด"
-                        : acc.type === "BANK"
-                        ? "ธนาคาร"
-                        : acc.type === "WALLET"
-                        ? "กระเป๋าเงินดิจิทัล"
-                        : acc.type === "CREDIT_CARD"
-                        ? "บัตรเครดิต"
-                        : "การลงทุน"}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-1">
-                  <button
-                    onClick={() => handleOpenEdit(acc)}
-                    className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground transition"
-                    title="แก้ไขบัญชี"
-                  >
-                    <Edit2 className="h-3.5 w-3.5" />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(acc.id)}
-                    className="rounded-lg p-1.5 text-muted-foreground hover:bg-danger-subtle hover:text-danger transition"
-                    title="ลบบัญชี"
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </button>
-                </div>
-              </div>
-
-              <div className="mt-6">
-                <span className="text-[11px] text-muted-foreground">ยอดเงินปัจจุบัน</span>
-                <p className="text-2xl font-black text-foreground">
-                  {formatCurrency(acc.currentBalance)}
-                </p>
-              </div>
-            </div>
-
-            <div className="mt-5 flex items-center justify-between border-t border-border pt-3 text-[11px] text-muted-foreground">
-              <span>ยอดเริ่มต้น: {formatCurrency(acc.initialBalance)}</span>
-              <span>{acc._count?.transactions || 0} ธุรกรรม</span>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Add / Edit Account Modal */}
-      {modalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
-          <div className="w-full max-w-md rounded-2xl bg-card p-6 shadow-2xl border border-border">
-            <div className="flex items-center justify-between border-b border-border pb-3">
-              <h2 className="text-base font-bold text-foreground">
-                {editingAcc ? "แก้ไขบัญชี" : "เพิ่มบัญชีใหม่"}
-              </h2>
-              <button
-                onClick={() => setModalOpen(false)}
-                className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground transition"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-
-            <form onSubmit={handleSave} className="mt-4 space-y-4">
-              <div>
-                <label className="block text-xs font-medium text-muted-foreground">
-                  ชื่อบัญชี *
-                </label>
-                <input
-                  type="text"
-                  required
-                  placeholder="เช่น บัญชีเงินเดือน, เงินสด"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="mt-1 w-full rounded-xl border border-border bg-card p-2.5 text-sm font-medium text-foreground focus:border-primary focus:ring-1 focus:ring-primary focus:outline-hidden"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-medium text-muted-foreground">
-                  ประเภทบัญชี *
-                </label>
-                <select
-                  value={type}
-                  onChange={(e) => setType(e.target.value)}
-                  className="mt-1 w-full rounded-xl border border-border bg-card p-2.5 text-sm font-medium text-foreground focus:border-primary focus:ring-1 focus:ring-primary focus:outline-hidden"
-                >
-                  <option value="BANK">ธนาคาร (Bank)</option>
-                  <option value="CASH">เงินสด (Cash)</option>
-                  <option value="WALLET">E-Wallet (กระเป๋าเงินดิจิทัล)</option>
-                  <option value="CREDIT_CARD">บัตรเครดิต (Credit Card)</option>
-                  <option value="INVESTMENT">พอร์ตลงทุน (Investment)</option>
-                  <option value="OTHER">อื่น ๆ</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-xs font-medium text-muted-foreground">
-                  ยอดเงินเริ่มต้น (บาท) *
-                </label>
-                <input
-                  type="number"
-                  step="0.01"
-                  required
-                  value={initialBalance}
-                  onChange={(e) => setInitialBalance(e.target.value)}
-                  className="mt-1 w-full rounded-xl border border-border bg-card p-2.5 text-sm font-medium text-foreground focus:border-primary focus:ring-1 focus:ring-primary focus:outline-hidden"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-medium text-muted-foreground mb-1.5">
-                  สีประจำบัญชี
-                </label>
-                <div className="flex flex-wrap gap-2">
-                  {colors.map((c) => (
-                    <button
-                      key={c}
-                      type="button"
-                      onClick={() => setColor(c)}
-                      className={`h-8 w-8 rounded-full transition ${
-                        color === c ? "ring-2 ring-primary ring-offset-2 scale-110" : ""
-                      }`}
-                      style={{ backgroundColor: c }}
-                    />
-                  ))}
-                </div>
-              </div>
-
-              <div className="flex gap-2 pt-3">
-                <button
-                  type="button"
-                  onClick={() => setModalOpen(false)}
-                  className="flex-1 rounded-xl border border-border py-2.5 text-xs font-semibold text-foreground hover:bg-muted transition"
-                >
-                  ยกเลิก
-                </button>
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="flex-1 rounded-xl bg-primary py-2.5 text-xs font-semibold text-primary-foreground hover:bg-primary-hover disabled:opacity-50 transition focus:outline-hidden focus:ring-2 focus:ring-primary"
-                >
-                  {loading ? "กำลังบันทึก..." : "บันทึกข้อมูล"}
-                </button>
-              </div>
-            </form>
-          </div>
+      {error && (
+        <div className="flex items-center gap-2 rounded-xl bg-danger-subtle p-3 text-xs font-semibold text-danger-text border border-danger/30">
+          <CheckCircle2 className="h-4 w-4 shrink-0 rotate-45 text-danger" />
+          {error}
         </div>
       )}
+
+      {/* Account Cards Grid or Empty State */}
+      {accounts.length === 0 ? (
+        <div className="rounded-2xl border border-border bg-card p-12 text-center shadow-xs">
+          <Wallet className="mx-auto mb-3 h-12 w-12 text-muted-foreground/60" />
+          <h3 className="text-sm font-bold text-foreground">
+            ยังไม่มีบัญชีการเงินในระบบ
+          </h3>
+          <p className="mt-1 text-xs text-muted-foreground">
+            เริ่มต้นเพิ่มบัญชีธนาคาร เงินสด หรือกระเป๋าเงินดิจิทัลของคุณเพื่อบันทึกรายการ
+          </p>
+          <button
+            type="button"
+            onClick={handleOpenAdd}
+            className="mt-4 inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground hover:bg-primary-hover transition focus:outline-hidden focus:ring-2 focus:ring-primary"
+          >
+            <Plus className="h-4 w-4" />
+            เพิ่มบัญชีแรก
+          </button>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {accounts.map((acc) => (
+            <div
+              key={acc.id}
+              className="flex flex-col justify-between rounded-2xl border border-border bg-card p-5 shadow-xs relative overflow-hidden"
+            >
+              {/* Top color bar indicator */}
+              <div
+                className="absolute top-0 left-0 right-0 h-1.5"
+                style={{ backgroundColor: acc.color || "#083D77" }}
+              />
+
+              <div>
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-3">
+                    <div
+                      className="flex h-11 w-11 items-center justify-center rounded-xl text-white shadow-xs"
+                      style={{ backgroundColor: acc.color || "#083D77" }}
+                    >
+                      <AccountIcon type={acc.type} size={22} />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-bold text-foreground">
+                        {acc.name}
+                      </h3>
+                      <span className="text-[11px] text-muted-foreground">
+                        {acc.type === "CASH"
+                          ? "เงินสด"
+                          : acc.type === "BANK"
+                          ? "ธนาคาร"
+                          : acc.type === "WALLET"
+                          ? "กระเป๋าเงินดิจิทัล"
+                          : acc.type === "CREDIT_CARD"
+                          ? "บัตรเครดิต"
+                          : "การลงทุน"}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => handleOpenEdit(acc)}
+                      className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition"
+                      title="แก้ไขบัญชี"
+                      aria-label="แก้ไขบัญชี"
+                    >
+                      <Edit2 className="h-3.5 w-3.5" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setDeleteId(acc.id)}
+                      className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-danger-subtle hover:text-danger transition"
+                      title="ลบบัญชี"
+                      aria-label="ลบบัญชี"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                </div>
+
+                <div className="mt-6">
+                  <span className="text-[11px] text-muted-foreground">ยอดเงินปัจจุบัน</span>
+                  <p className="text-2xl font-black text-foreground">
+                    {formatCurrency(acc.currentBalance)}
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-5 flex items-center justify-between border-t border-border pt-3 text-[11px] text-muted-foreground">
+                <span>ยอดเริ่มต้น: {formatCurrency(acc.initialBalance)}</span>
+                <span>{acc._count?.transactions || 0} ธุรกรรม</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Add / Edit Account Modal */}
+      <ModalWrapper
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        ariaLabel={editingAcc ? "แก้ไขบัญชี" : "เพิ่มบัญชีใหม่"}
+      >
+        <div className="w-full max-w-md rounded-2xl bg-card p-6 shadow-2xl border border-border">
+          <div className="flex items-center justify-between border-b border-border pb-3">
+            <h2 className="text-base font-bold text-foreground">
+              {editingAcc ? "แก้ไขบัญชี" : "เพิ่มบัญชีใหม่"}
+            </h2>
+            <button
+              type="button"
+              onClick={() => setModalOpen(false)}
+              className="rounded-lg p-2 text-muted-foreground hover:bg-muted hover:text-foreground transition"
+              aria-label="ปิดหน้าต่าง"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
+
+          <form onSubmit={handleSave} className="mt-4 space-y-4">
+            {error && (
+              <div className="rounded-xl bg-danger-subtle p-2.5 text-xs font-semibold text-danger-text border border-danger/30">
+                {error}
+              </div>
+            )}
+
+            <div>
+              <label className="block text-xs font-medium text-muted-foreground">
+                ชื่อบัญชี *
+              </label>
+              <input
+                type="text"
+                required
+                placeholder="เช่น บัญชีเงินเดือน, เงินสด"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="mt-1 w-full rounded-xl border border-border bg-card p-2.5 text-sm font-medium text-foreground focus:border-primary focus:ring-1 focus:ring-primary focus:outline-hidden"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-medium text-muted-foreground">
+                ประเภทบัญชี *
+              </label>
+              <select
+                value={type}
+                onChange={(e) => setType(e.target.value)}
+                className="mt-1 w-full rounded-xl border border-border bg-card p-2.5 text-sm font-medium text-foreground focus:border-primary focus:ring-1 focus:ring-primary focus:outline-hidden"
+              >
+                <option value="BANK">ธนาคาร (Bank)</option>
+                <option value="CASH">เงินสด (Cash)</option>
+                <option value="WALLET">E-Wallet (กระเป๋าเงินดิจิทัล)</option>
+                <option value="CREDIT_CARD">บัตรเครดิต (Credit Card)</option>
+                <option value="INVESTMENT">พอร์ตลงทุน (Investment)</option>
+                <option value="OTHER">อื่น ๆ</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-xs font-medium text-muted-foreground">
+                ยอดเงินเริ่มต้น (บาท) *
+              </label>
+              <input
+                type="number"
+                step="0.01"
+                required
+                value={initialBalance}
+                onChange={(e) => setInitialBalance(e.target.value)}
+                className="mt-1 w-full rounded-xl border border-border bg-card p-2.5 text-sm font-medium text-foreground focus:border-primary focus:ring-1 focus:ring-primary focus:outline-hidden"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-medium text-muted-foreground mb-1.5">
+                สีประจำบัญชี
+              </label>
+              <div className="flex flex-wrap items-center gap-2">
+                {colors.map((c) => (
+                  <button
+                    key={c}
+                    type="button"
+                    onClick={() => setColor(c)}
+                    className={`h-8 w-8 rounded-full transition ${
+                      color === c ? "ring-2 ring-primary ring-offset-2 scale-110" : ""
+                    }`}
+                    style={{ backgroundColor: c }}
+                    aria-label={`เลือกสี ${c}`}
+                  />
+                ))}
+                <label className="relative flex h-8 w-8 items-center justify-center rounded-full border border-border cursor-pointer overflow-hidden shadow-2xs hover:scale-105 transition" title="เลือกสีเอง">
+                  <input
+                    type="color"
+                    value={color}
+                    onChange={(e) => setColor(e.target.value)}
+                    className="absolute inset-0 opacity-0 cursor-pointer h-full w-full"
+                  />
+                  <span className="h-full w-full rounded-full" style={{ backgroundColor: color }} />
+                </label>
+              </div>
+            </div>
+
+            <div className="flex gap-2 pt-3">
+              <button
+                type="button"
+                onClick={() => setModalOpen(false)}
+                className="flex-1 rounded-xl border border-border py-2.5 text-xs font-semibold text-foreground hover:bg-muted transition"
+              >
+                ยกเลิก
+              </button>
+              <button
+                type="submit"
+                disabled={loading}
+                className="flex-1 rounded-xl bg-primary py-2.5 text-xs font-semibold text-primary-foreground hover:bg-primary-hover disabled:opacity-50 transition focus:outline-hidden focus:ring-2 focus:ring-primary"
+              >
+                {loading ? "กำลังบันทึก..." : "บันทึกข้อมูล"}
+              </button>
+            </div>
+          </form>
+        </div>
+      </ModalWrapper>
+
+      {/* Accessible Delete Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={Boolean(deleteId)}
+        onClose={() => setDeleteId(null)}
+        onConfirm={handleConfirmDelete}
+        loading={deleting}
+        title="ยืนยันการลบ/ระงับบัญชี?"
+        message="การลบบัญชีนี้จะไม่ลบประวัติธุรกรรมเดิม แต่จะระงับการเลือกใช้งานบัญชีนี้ในอนาคต"
+        confirmLabel="ยืนยันการลบ"
+        variant="danger"
+      />
     </div>
   );
 }

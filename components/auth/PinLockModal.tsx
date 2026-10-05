@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { unlockWithPin, resetSecurityLock } from "@/lib/actions/auth";
 import { Lock, Delete, AlertTriangle, ShieldCheck } from "lucide-react";
 
@@ -14,24 +14,7 @@ export function PinLockModal({ onUnlocked }: PinLockModalProps) {
   const [loading, setLoading] = useState<boolean>(false);
   const [showResetConfirm, setShowResetConfirm] = useState<boolean>(false);
 
-  const handleKeyPress = (num: string) => {
-    if (pin.length < 8) {
-      setPin((prev) => prev + num);
-      setError("");
-    }
-  };
-
-  const handleDelete = () => {
-    setPin((prev) => prev.slice(0, -1));
-    setError("");
-  };
-
-  const handleClear = () => {
-    setPin("");
-    setError("");
-  };
-
-  const handleSubmit = async (e?: React.FormEvent) => {
+  const handleSubmit = useCallback(async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (pin.length < 4) {
       setError("กรุณากรอก PIN อย่างน้อย 4 หลัก");
@@ -54,6 +37,49 @@ export function PinLockModal({ onUnlocked }: PinLockModalProps) {
     } finally {
       setLoading(false);
     }
+  }, [pin, onUnlocked]);
+
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (showResetConfirm) return;
+      if (/^[0-9]$/.test(e.key)) {
+        if (pin.length < 8) {
+          setPin((prev) => (prev.length < 8 ? prev + e.key : prev));
+          setError("");
+        }
+      } else if (e.key === "Backspace") {
+        setPin((prev) => prev.slice(0, -1));
+        setError("");
+      } else if (e.key === "Enter") {
+        e.preventDefault();
+        if (pin.length >= 4) {
+          handleSubmit();
+        } else {
+          setError("กรุณากรอก PIN อย่างน้อย 4 หลัก");
+        }
+      } else if (e.key === "Escape") {
+        setPin("");
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [pin, showResetConfirm, handleSubmit]);
+
+  const handleKeyPress = (num: string) => {
+    if (pin.length < 8) {
+      setPin((prev) => prev + num);
+      setError("");
+    }
+  };
+
+  const handleDelete = () => {
+    setPin((prev) => prev.slice(0, -1));
+    setError("");
+  };
+
+  const handleClear = () => {
+    setPin("");
+    setError("");
   };
 
   const handleReset = async () => {
@@ -69,26 +95,34 @@ export function PinLockModal({ onUnlocked }: PinLockModalProps) {
     }
   };
 
+  // Display between 6 to 8 dots depending on PIN length
+  const totalDots = Math.max(6, Math.min(8, pin.length));
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-4">
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="pin-lock-title"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-4"
+    >
       <div className="w-full max-w-sm rounded-2xl bg-card p-6 shadow-2xl border border-border">
         <div className="flex flex-col items-center text-center">
           <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-primary-subtle text-primary">
             <Lock className="h-7 w-7" />
           </div>
-          <h2 className="text-xl font-bold text-foreground">
+          <h2 id="pin-lock-title" className="text-xl font-bold text-foreground">
             ระบบบัญชีส่วนตัว
           </h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            กรุณากรอกรหัส PIN เพื่อเข้าใช้งาน
+            กรุณากรอกรหัส PIN (4 - 8 หลัก)
           </p>
 
           {/* Dots Indicator */}
-          <div className="my-5 flex justify-center gap-3">
-            {[0, 1, 2, 3, 4, 5].map((index) => (
+          <div className="my-5 flex justify-center gap-3" aria-label={`กรอกแล้ว ${pin.length} หลัก`}>
+            {Array.from({ length: totalDots }).map((_, index) => (
               <div
                 key={index}
-                className={`h-4 w-4 rounded-full border-2 transition-all ${
+                className={`h-4 w-4 rounded-full border-2 transition-all duration-150 ${
                   index < pin.length
                     ? "border-primary bg-primary scale-110"
                     : "border-border bg-transparent"
@@ -98,7 +132,7 @@ export function PinLockModal({ onUnlocked }: PinLockModalProps) {
           </div>
 
           {error && (
-            <p className="mb-3 text-sm font-semibold text-danger">
+            <p role="alert" className="mb-3 text-sm font-semibold text-danger">
               {error}
             </p>
           )}

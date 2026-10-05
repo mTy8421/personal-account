@@ -27,7 +27,7 @@ interface SidebarProps {
 
 export function Sidebar({ onOpenNewTransaction }: SidebarProps) {
   const pathname = usePathname();
-  const { theme, setTheme, isDark } = useTheme();
+  const { setTheme, isDark } = useTheme();
 
   const navLinks = [
     { href: "/dashboard", label: "แดชบอร์ด", icon: LayoutDashboard },
@@ -76,7 +76,12 @@ export function Sidebar({ onOpenNewTransaction }: SidebarProps) {
       <nav className="mt-6 flex-1 space-y-1">
         {navLinks.map((item) => {
           const Icon = item.icon;
-          const isActive = pathname === item.href;
+          const isActive =
+            item.href === "/dashboard"
+              ? pathname === "/dashboard"
+              : item.href === "/settings"
+              ? pathname === "/settings"
+              : pathname.startsWith(item.href);
           return (
             <Link
               key={item.href}

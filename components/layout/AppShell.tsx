@@ -1,12 +1,14 @@
 "use client";
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Sidebar } from "./Sidebar";
 import { MobileNav } from "./MobileNav";
 import { TransactionDialog } from "@/components/transactions/TransactionDialog";
 import { PinLockGatekeeper } from "@/components/auth/PinLockGatekeeper";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const handleOpenNewTransaction = () => {
@@ -34,7 +36,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           isOpen={isDialogOpen}
           onClose={() => setIsDialogOpen(false)}
           onSuccess={() => {
-            window.location.reload();
+            router.refresh();
           }}
         />
       </div>

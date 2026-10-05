@@ -19,6 +19,8 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { CategoryIcon } from "@/components/ui/CategoryIcon";
+import { ModalWrapper } from "@/components/ui/ModalWrapper";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 
 interface BudgetsClientProps {
   budgets: BudgetData[];
@@ -40,6 +42,20 @@ export function BudgetsClient({
   const [categoryId, setCategoryId] = useState("");
   const [amount, setAmount] = useState("");
   const [loading, setLoading] = useState(false);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
+
+  const showFeedback = (msg: string, isError = false) => {
+    if (isError) {
+      setError(msg);
+      setTimeout(() => setError(""), 5000);
+    } else {
+      setMessage(msg);
+      setTimeout(() => setMessage(""), 4000);
+    }
+  };
 
   // Month navigation
   const handlePrevMonth = () => {
@@ -70,6 +86,7 @@ export function BudgetsClient({
       setCategoryId(categories[0]?.id || "");
       setAmount("");
     }
+    setError("");
     setModalOpen(true);
   };
 
@@ -79,6 +96,7 @@ export function BudgetsClient({
     if (!categoryId || isNaN(numAmount) || numAmount <= 0) return;
 
     setLoading(true);
+    setError("");
     try {
       await setBudget({
         categoryId,
@@ -87,21 +105,27 @@ export function BudgetsClient({
         year,
       });
       setModalOpen(false);
+      showFeedback("บันทึกงบประมาณเรียบร้อยแล้ว");
       router.refresh();
     } catch (err: any) {
-      alert(err.message || "เกิดข้อผิดพลาดในการตั้งงบประมาณ");
+      setError(err.message || "เกิดข้อผิดพลาดในการตั้งงบประมาณ");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("คุณต้องการลบงบประมาณนี้หรือไม่?")) return;
+  const handleConfirmDelete = async () => {
+    if (!deleteId) return;
+    setDeleting(true);
     try {
-      await deleteBudget(id);
+      await deleteBudget(deleteId);
+      setDeleteId(null);
+      showFeedback("ลบงบประมาณเรียบร้อยแล้ว");
       router.refresh();
     } catch {
-      alert("ไม่สามารถลบได้");
+      showFeedback("ไม่สามารถลบได้", true);
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -152,6 +176,20 @@ export function BudgetsClient({
           </button>
         </div>
       </div>
+
+      {message && (
+        <div className="flex items-center gap-2 rounded-xl bg-success-subtle p-3 text-xs font-semibold text-success-text border border-success/30">
+          <CheckCircle className="h-4 w-4 shrink-0" />
+          {message}
+        </div>
+      )}
+
+      {error && (
+        <div className="flex items-center gap-2 rounded-xl bg-danger-subtle p-3 text-xs font-semibold text-danger-text border border-danger/30">
+          <AlertCircle className="h-4 w-4 shrink-0" />
+          {error}
+        </div>
+      )}
 
       {/* Overview Progress Card */}
       <div className="rounded-2xl border border-border bg-card p-5 shadow-xs">
@@ -218,6 +256,7 @@ export function BudgetsClient({
             คลิกปุ่ม &quot;ตั้งงบประมาณ&quot; เพื่อเริ่มต้นกำหนดเป้าหมายการใช้จ่าย
           </p>
           <button
+            type="button"
             onClick={() => handleOpenAdd()}
             className="mt-4 inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground hover:bg-primary-hover transition focus:outline-hidden focus:ring-2 focus:ring-primary"
           >
@@ -259,16 +298,20 @@ export function BudgetsClient({
 
                   <div className="flex items-center gap-1">
                     <button
+                      type="button"
                       onClick={() => handleOpenAdd(b)}
-                      className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground transition"
+                      className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition"
                       title="แก้ไขงบ"
+                      aria-label="แก้ไขงบ"
                     >
                       <Edit2 className="h-3.5 w-3.5" />
                     </button>
                     <button
-                      onClick={() => handleDelete(b.id)}
-                      className="rounded-lg p-1.5 text-muted-foreground hover:bg-danger-subtle hover:text-danger transition"
+                      type="button"
+                      onClick={() => setDeleteId(b.id)}
+                      className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-danger-subtle hover:text-danger transition"
                       title="ลบงบ"
+                      aria-label="ลบงบ"
                     >
                       <Trash2 className="h-3.5 w-3.5" />
                     </button>
@@ -324,77 +367,99 @@ export function BudgetsClient({
         </div>
       )}
 
-      {/* Set Budget Modal */}
-      {modalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
-          <div className="w-full max-w-sm rounded-2xl bg-card p-6 shadow-2xl border border-border">
-            <div className="flex items-center justify-between border-b border-border pb-3">
-              <h2 className="text-base font-bold text-foreground">
-                ตั้งงบประมาณ ({formatThaiMonthYear(month, year)})
-              </h2>
-              <button
-                onClick={() => setModalOpen(false)}
-                className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground transition"
+      {/* Set Budget Modal with Focus Trap & Escape */}
+      <ModalWrapper
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        ariaLabel={`ตั้งงบประมาณ (${formatThaiMonthYear(month, year)})`}
+      >
+        <div className="w-full max-w-sm rounded-2xl bg-card p-6 shadow-2xl border border-border">
+          <div className="flex items-center justify-between border-b border-border pb-3">
+            <h2 className="text-base font-bold text-foreground">
+              ตั้งงบประมาณ ({formatThaiMonthYear(month, year)})
+            </h2>
+            <button
+              type="button"
+              onClick={() => setModalOpen(false)}
+              className="rounded-lg p-2 text-muted-foreground hover:bg-muted hover:text-foreground transition"
+              aria-label="ปิดหน้าต่าง"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
+
+          <form onSubmit={handleSave} className="mt-4 space-y-4">
+            {error && (
+              <div className="rounded-xl bg-danger-subtle p-2.5 text-xs font-semibold text-danger-text border border-danger/30">
+                {error}
+              </div>
+            )}
+
+            <div>
+              <label className="block text-xs font-medium text-muted-foreground">
+                หมวดหมู่ค่าใช้จ่าย *
+              </label>
+              <select
+                required
+                value={categoryId}
+                onChange={(e) => setCategoryId(e.target.value)}
+                className="mt-1 w-full rounded-xl border border-border bg-card p-2.5 text-sm font-medium text-foreground focus:border-primary focus:ring-1 focus:ring-primary focus:outline-hidden"
               >
-                <X className="h-5 w-5" />
-              </button>
+                {categories.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
             </div>
 
-            <form onSubmit={handleSave} className="mt-4 space-y-4">
-              <div>
-                <label className="block text-xs font-medium text-muted-foreground">
-                  หมวดหมู่ค่าใช้จ่าย *
-                </label>
-                <select
-                  required
-                  value={categoryId}
-                  onChange={(e) => setCategoryId(e.target.value)}
-                  className="mt-1 w-full rounded-xl border border-border bg-card p-2.5 text-sm font-medium text-foreground focus:border-primary focus:ring-1 focus:ring-primary focus:outline-hidden"
-                >
-                  {categories.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
+            <div>
+              <label className="block text-xs font-medium text-muted-foreground">
+                จำนวนงบประมาณ (บาท) *
+              </label>
+              <input
+                type="number"
+                step="1"
+                min="1"
+                required
+                placeholder="เช่น 5000"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                className="mt-1 w-full rounded-xl border border-border bg-card p-2.5 text-sm font-medium text-foreground focus:border-primary focus:ring-1 focus:ring-primary focus:outline-hidden"
+              />
+            </div>
 
-              <div>
-                <label className="block text-xs font-medium text-muted-foreground">
-                  จำนวนงบประมาณ (บาท) *
-                </label>
-                <input
-                  type="number"
-                  step="1"
-                  min="1"
-                  required
-                  placeholder="เช่น 5000"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  className="mt-1 w-full rounded-xl border border-border bg-card p-2.5 text-sm font-medium text-foreground focus:border-primary focus:ring-1 focus:ring-primary focus:outline-hidden"
-                />
-              </div>
-
-              <div className="flex gap-2 pt-3">
-                <button
-                  type="button"
-                  onClick={() => setModalOpen(false)}
-                  className="flex-1 rounded-xl border border-border py-2.5 text-xs font-semibold text-foreground hover:bg-muted transition"
-                >
-                  ยกเลิก
-                </button>
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="flex-1 rounded-xl bg-primary py-2.5 text-xs font-semibold text-primary-foreground hover:bg-primary-hover disabled:opacity-50 transition focus:outline-hidden focus:ring-2 focus:ring-primary"
-                >
-                  {loading ? "กำลังบันทึก..." : "บันทึกงบ"}
-                </button>
-              </div>
-            </form>
-          </div>
+            <div className="flex gap-2 pt-3">
+              <button
+                type="button"
+                onClick={() => setModalOpen(false)}
+                className="flex-1 rounded-xl border border-border py-2.5 text-xs font-semibold text-foreground hover:bg-muted transition"
+              >
+                ยกเลิก
+              </button>
+              <button
+                type="submit"
+                disabled={loading}
+                className="flex-1 rounded-xl bg-primary py-2.5 text-xs font-semibold text-primary-foreground hover:bg-primary-hover disabled:opacity-50 transition focus:outline-hidden focus:ring-2 focus:ring-primary"
+              >
+                {loading ? "กำลังบันทึก..." : "บันทึกงบ"}
+              </button>
+            </div>
+          </form>
         </div>
-      )}
+      </ModalWrapper>
+
+      {/* Accessible Delete Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={Boolean(deleteId)}
+        onClose={() => setDeleteId(null)}
+        onConfirm={handleConfirmDelete}
+        loading={deleting}
+        title="ยืนยันการลบงบประมาณ?"
+        message="การลบงบประมาณนี้จะไม่ส่งผลต่อประวัติธุรกรรมที่เคยบันทึกไว้"
+        confirmLabel="ลบงบประมาณ"
+        variant="danger"
+      />
     </div>
   );
 }

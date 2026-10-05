@@ -62,12 +62,12 @@ export function MonthlyTrendChart({ data }: MonthlyTrendChartProps) {
         >
           <XAxis
             dataKey="month"
-            tick={{ fontSize: 12, fill: "#888888" }}
+            tick={{ fontSize: 12, fill: "var(--color-muted-foreground)" }}
             axisLine={false}
             tickLine={false}
           />
           <YAxis
-            tick={{ fontSize: 11, fill: "#888888" }}
+            tick={{ fontSize: 11, fill: "var(--color-muted-foreground)" }}
             axisLine={false}
             tickLine={false}
             tickFormatter={(val) => `${val >= 1000 ? `${(val / 1000).toFixed(0)}k` : val}`}

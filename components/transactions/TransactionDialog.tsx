@@ -7,7 +7,7 @@ import { getCategories } from "@/lib/actions/categories";
 import { AccountData, CategoryData, TransactionData } from "@/lib/types";
 import { toInputDateFormat } from "@/lib/utils/date";
 import { X, ArrowDownRight, ArrowUpRight, ArrowLeftRight } from "lucide-react";
-import { CategoryIcon } from "@/components/ui/CategoryIcon";
+import { ModalWrapper } from "@/components/ui/ModalWrapper";
 
 interface TransactionDialogProps {
   isOpen: boolean;
@@ -148,16 +148,20 @@ export function TransactionDialog({
     }
   };
 
+  const dialogTitle = editData ? "แก้ไขรายการธุรกรรม" : "เพิ่มรายการใหม่";
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 overflow-y-auto">
+    <ModalWrapper isOpen={isOpen} onClose={onClose} ariaLabel={dialogTitle}>
       <div className="w-full max-w-lg rounded-2xl bg-card p-6 shadow-2xl border border-border my-8">
         <div className="flex items-center justify-between border-b border-border pb-4">
           <h2 className="text-lg font-bold text-foreground">
-            {editData ? "แก้ไขรายการธุรกรรม" : "เพิ่มรายการใหม่"}
+            {dialogTitle}
           </h2>
           <button
+            type="button"
             onClick={onClose}
-            className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground transition"
+            className="rounded-lg p-2 text-muted-foreground hover:bg-muted hover:text-foreground transition"
+            aria-label="ปิดหน้าต่าง"
           >
             <X className="h-5 w-5" />
           </button>
@@ -354,6 +358,6 @@ export function TransactionDialog({
           </div>
         </form>
       </div>
-    </div>
+    </ModalWrapper>
   );
 }

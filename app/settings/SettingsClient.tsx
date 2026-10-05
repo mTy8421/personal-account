@@ -2,29 +2,27 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { setPinLock, resetSecurityLock } from "@/lib/actions/auth";
+import { setPinLock } from "@/lib/actions/auth";
 import { useTheme } from "@/components/theme/ThemeProvider";
 import {
-  Settings,
   Lock,
   Sun,
   Moon,
   Laptop,
   Shield,
-  HardDrive,
   CheckCircle2,
   AlertTriangle,
   KeyRound,
-  FileCode,
 } from "lucide-react";
 import Link from "next/link";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 
 interface SettingsClientProps {
   isPinEnabled: boolean;
-  currency: string;
+  currency?: string;
 }
 
-export function SettingsClient({ isPinEnabled, currency }: SettingsClientProps) {
+export function SettingsClient({ isPinEnabled }: SettingsClientProps) {
   const router = useRouter();
   const { theme, setTheme } = useTheme();
 
@@ -34,15 +32,26 @@ export function SettingsClient({ isPinEnabled, currency }: SettingsClientProps) 
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [confirmDisablePin, setConfirmDisablePin] = useState(false);
+
+  const showFeedback = (msg: string, isError = false) => {
+    if (isError) {
+      setError(msg);
+      setTimeout(() => setError(""), 5000);
+    } else {
+      setMessage(msg);
+      setTimeout(() => setMessage(""), 4000);
+    }
+  };
 
   const handleUpdatePin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (newPin.length < 4) {
-      setError("รหัส PIN ต้องมีความยาวอย่างน้อย 4 หลัก");
+      showFeedback("รหัส PIN ต้องมีความยาวอย่างน้อย 4 หลัก", true);
       return;
     }
     if (newPin !== confirmPin) {
-      setError("รหัส PIN ทั้งสองช่องไม่ตรงกัน");
+      showFeedback("รหัส PIN ทั้งสองช่องไม่ตรงกัน", true);
       return;
     }
 
@@ -54,25 +63,25 @@ export function SettingsClient({ isPinEnabled, currency }: SettingsClientProps) 
       setPinEnabled(true);
       setNewPin("");
       setConfirmPin("");
-      setMessage("ตั้งค่ารหัส PIN สำเร็จแล้ว");
+      showFeedback("ตั้งค่ารหัส PIN สำเร็จแล้ว");
       router.refresh();
     } catch (err: any) {
-      setError(err.message || "เกิดข้อผิดพลาด");
+      showFeedback(err.message || "เกิดข้อผิดพลาด", true);
     } finally {
       setLoading(false);
     }
   };
 
   const handleDisablePin = async () => {
-    if (!confirm("คุณต้องการปิดการใช้งานระบบ PIN Lock หรือไม่?")) return;
     setLoading(true);
     try {
       await setPinLock(null);
       setPinEnabled(false);
-      setMessage("ปิดการใช้งาน PIN Lock เรียบร้อยแล้ว");
+      setConfirmDisablePin(false);
+      showFeedback("ปิดการใช้งาน PIN Lock เรียบร้อยแล้ว");
       router.refresh();
     } catch {
-      setError("ไม่สามารถปิดการใช้งานได้");
+      showFeedback("ไม่สามารถปิดการใช้งานได้", true);
     } finally {
       setLoading(false);
     }
@@ -176,7 +185,7 @@ export function SettingsClient({ isPinEnabled, currency }: SettingsClientProps) 
             {pinEnabled && (
               <button
                 type="button"
-                onClick={handleDisablePin}
+                onClick={() => setConfirmDisablePin(true)}
                 disabled={loading}
                 className="rounded-xl border border-danger/40 px-4 py-2 text-xs font-semibold text-danger hover:bg-danger-subtle transition"
               >
@@ -280,6 +289,18 @@ export function SettingsClient({ isPinEnabled, currency }: SettingsClientProps) 
           </Link>
         </div>
       </div>
+
+      {/* Confirm Disable PIN Dialog */}
+      <ConfirmDialog
+        isOpen={confirmDisablePin}
+        title="ปิดการใช้งาน PIN Lock"
+        message="คุณแน่ใจหรือไม่ว่าต้องการปิดการใช้งานระบบ PIN Lock? ใครก็ตามที่เปิดอุปกรณ์นี้จะสามารถเข้าถึงข้อมูลการเงินของคุณได้ทันทีโดยไม่ต้องใส่รหัส"
+        confirmText={loading ? "กำลังดำเนินการ..." : "ปิดการใช้งาน"}
+        cancelText="ยกเลิก"
+        variant="danger"
+        onConfirm={handleDisablePin}
+        onClose={() => setConfirmDisablePin(false)}
+      />
     </div>
   );
 }
