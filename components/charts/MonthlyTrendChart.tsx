@@ -24,14 +24,14 @@ interface MonthlyTrendChartProps {
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     return (
-      <div className="rounded-xl bg-white p-3 shadow-lg border border-zinc-200 dark:bg-zinc-800 dark:border-zinc-700">
-        <p className="text-xs font-bold text-zinc-700 dark:text-zinc-200 mb-1">
+      <div className="rounded-xl bg-card p-3 shadow-lg border border-border">
+        <p className="text-xs font-bold text-foreground mb-1">
           {label}
         </p>
         {payload.map((item: any, i: number) => (
           <div key={i} className="flex justify-between gap-4 text-xs py-0.5">
             <span style={{ color: item.color }}>{item.name}:</span>
-            <span className="font-semibold text-zinc-900 dark:text-zinc-100">
+            <span className="font-semibold text-foreground">
               {formatCurrency(item.value)}
             </span>
           </div>
@@ -50,7 +50,7 @@ export function MonthlyTrendChart({ data }: MonthlyTrendChartProps) {
   }, []);
 
   if (!mounted) {
-    return <div className="h-72 w-full animate-pulse rounded-xl bg-zinc-100 dark:bg-zinc-800" />;
+    return <div className="h-72 w-full animate-pulse rounded-xl bg-muted" />;
   }
 
   return (
@@ -81,14 +81,14 @@ export function MonthlyTrendChart({ data }: MonthlyTrendChartProps) {
           <Bar
             name="รายรับ"
             dataKey="income"
-            fill="#10b981"
+            fill="#2A9D8F"
             radius={[4, 4, 0, 0]}
             maxBarSize={32}
           />
           <Bar
             name="รายจ่าย"
             dataKey="expense"
-            fill="#ef4444"
+            fill="#DA4167"
             radius={[4, 4, 0, 0]}
             maxBarSize={32}
           />

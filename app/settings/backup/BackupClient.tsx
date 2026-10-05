@@ -78,35 +78,35 @@ export function BackupClient({ lastBackupAt }: BackupClientProps) {
     <div className="space-y-6 max-w-4xl">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
+        <h1 className="text-2xl font-bold tracking-tight text-foreground">
           สำรองและกู้คืนข้อมูล (Backup & Restore)
         </h1>
-        <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
+        <p className="text-xs text-muted-foreground mt-0.5">
           ข้อมูลทั้งหมดถูกจัดเก็บอยู่บนเครื่องของคุณเอง สามารถดาวน์โหลดเก็บไว้และนำกลับมาใช้งานได้ตลอดเวลา
         </p>
       </div>
 
       {/* Backup Status Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-2xl border border-zinc-200 bg-white p-5 shadow-xs dark:border-zinc-800 dark:bg-zinc-900">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-2xl border border-border bg-card p-5 shadow-xs">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-subtle text-primary">
             <ShieldCheck className="h-5 w-5" />
           </div>
           <div>
-            <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-100">
+            <h3 className="text-sm font-bold text-foreground">
               สถานะความปลอดภัยของข้อมูล
             </h3>
-            <p className="text-xs text-zinc-400">
-              ตำแหน่งฐานข้อมูล SQLite: <code className="rounded bg-zinc-100 px-1.5 py-0.5 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">./data/database.db</code>
+            <p className="text-xs text-muted-foreground">
+              ตำแหน่งฐานข้อมูล SQLite: <code className="rounded bg-muted px-1.5 py-0.5 font-semibold text-foreground">./data/database.db</code>
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400">
-          <Clock className="h-4 w-4 text-emerald-500" />
+        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+          <Clock className="h-4 w-4 text-primary" />
           <span>
             Backup ล่าสุด:{" "}
-            <strong className="text-zinc-800 dark:text-zinc-200">
+            <strong className="text-foreground">
               {lastBackupAt ? formatThaiDateTime(lastBackupAt) : "ยังไม่มีการสำรองข้อมูล"}
             </strong>
           </span>
@@ -114,28 +114,28 @@ export function BackupClient({ lastBackupAt }: BackupClientProps) {
       </div>
 
       {message && (
-        <div className="flex items-center gap-2 rounded-xl bg-emerald-50 p-4 text-xs font-semibold text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
+        <div className="flex items-center gap-2 rounded-xl bg-success-subtle p-4 text-xs font-semibold text-success-text border border-success/30">
           <CheckCircle2 className="h-4 w-4 shrink-0" />
           {message}
         </div>
       )}
 
       {error && (
-        <div className="flex items-center gap-2 rounded-xl bg-rose-50 p-4 text-xs font-semibold text-rose-600 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200 dark:border-rose-900">
+        <div className="flex items-center gap-2 rounded-xl bg-danger-subtle p-4 text-xs font-semibold text-danger-text border border-danger/30">
           <AlertTriangle className="h-4 w-4 shrink-0" />
           {error}
         </div>
       )}
 
       {/* Export Section */}
-      <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-xs dark:border-zinc-800 dark:bg-zinc-900 space-y-4">
+      <div className="rounded-2xl border border-border bg-card p-6 shadow-xs space-y-4">
         <div className="flex items-center gap-2">
-          <HardDriveDownload className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
-          <h2 className="text-base font-bold text-zinc-900 dark:text-zinc-100">
+          <HardDriveDownload className="h-5 w-5 text-primary" />
+          <h2 className="text-base font-bold text-foreground">
             ส่งออกข้อมูล (Export Backup)
           </h2>
         </div>
-        <p className="text-xs text-zinc-500 dark:text-zinc-400">
+        <p className="text-xs text-muted-foreground">
           เลือกรูปแบบไฟล์ที่คุณต้องการบันทึกเก็บไว้สำรอง:
         </p>
 
@@ -144,20 +144,20 @@ export function BackupClient({ lastBackupAt }: BackupClientProps) {
           <a
             href="/api/backup/export?format=json"
             download
-            className="flex flex-col justify-between rounded-xl border border-zinc-200 p-4 hover:border-emerald-500 hover:bg-emerald-50/30 dark:border-zinc-800 dark:hover:border-emerald-600 dark:hover:bg-emerald-950/20 transition group"
+            className="flex flex-col justify-between rounded-xl border border-border p-4 hover:border-primary hover:bg-primary-subtle/30 transition group"
           >
             <div>
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-100 text-emerald-600 dark:bg-emerald-950 dark:text-emerald-400 mb-3 group-hover:scale-105 transition">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-subtle text-primary mb-3 group-hover:scale-105 transition">
                 <FileJson className="h-5 w-5" />
               </div>
-              <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-100">
+              <h3 className="text-sm font-bold text-foreground">
                 ไฟล์ JSON (.json)
               </h3>
-              <p className="text-xs text-zinc-400 mt-1">
+              <p className="text-xs text-muted-foreground mt-1">
                 บันทึกข้อมูลครบถ้วน 100% (บัญชี, หมวดหมู่, ธุรกรรม, งบประมาณ, รายจ่ายประจำ)
               </p>
             </div>
-            <span className="mt-4 text-xs font-bold text-emerald-600 dark:text-emerald-400">
+            <span className="mt-4 text-xs font-bold text-primary group-hover:underline">
               ดาวน์โหลด JSON →
             </span>
           </a>
@@ -166,20 +166,20 @@ export function BackupClient({ lastBackupAt }: BackupClientProps) {
           <a
             href="/api/backup/export?format=csv"
             download
-            className="flex flex-col justify-between rounded-xl border border-zinc-200 p-4 hover:border-blue-500 hover:bg-blue-50/30 dark:border-zinc-800 dark:hover:border-blue-600 dark:hover:bg-blue-950/20 transition group"
+            className="flex flex-col justify-between rounded-xl border border-border p-4 hover:border-accent hover:bg-accent-subtle/30 transition group"
           >
             <div>
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 text-blue-600 dark:bg-blue-950 dark:text-blue-400 mb-3 group-hover:scale-105 transition">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent-subtle text-accent mb-3 group-hover:scale-105 transition">
                 <FileSpreadsheet className="h-5 w-5" />
               </div>
-              <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-100">
+              <h3 className="text-sm font-bold text-foreground">
                 ไฟล์ CSV (.csv)
               </h3>
-              <p className="text-xs text-zinc-400 mt-1">
+              <p className="text-xs text-muted-foreground mt-1">
                 สำหรับเปิดและคำนวณใน Microsoft Excel, Google Sheets, หรือ Numbers
               </p>
             </div>
-            <span className="mt-4 text-xs font-bold text-blue-600 dark:text-blue-400">
+            <span className="mt-4 text-xs font-bold text-accent-text dark:text-accent group-hover:underline">
               ดาวน์โหลด CSV →
             </span>
           </a>
@@ -188,20 +188,20 @@ export function BackupClient({ lastBackupAt }: BackupClientProps) {
           <a
             href="/api/backup/export?format=sqlite"
             download
-            className="flex flex-col justify-between rounded-xl border border-zinc-200 p-4 hover:border-purple-500 hover:bg-purple-50/30 dark:border-zinc-800 dark:hover:border-purple-600 dark:hover:bg-purple-950/20 transition group"
+            className="flex flex-col justify-between rounded-xl border border-border p-4 hover:border-success hover:bg-success-subtle/30 transition group"
           >
             <div>
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-purple-100 text-purple-600 dark:bg-purple-950 dark:text-purple-400 mb-3 group-hover:scale-105 transition">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-success-subtle text-success mb-3 group-hover:scale-105 transition">
                 <Database className="h-5 w-5" />
               </div>
-              <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-100">
+              <h3 className="text-sm font-bold text-foreground">
                 ไฟล์ฐานข้อมูล (.db)
               </h3>
-              <p className="text-xs text-zinc-400 mt-1">
+              <p className="text-xs text-muted-foreground mt-1">
                 ไฟล์ SQLite database.db ฉบับสมบูรณ์ สามารถนำไปเปิดด้วย DB Browser for SQLite ได้
               </p>
             </div>
-            <span className="mt-4 text-xs font-bold text-purple-600 dark:text-purple-400">
+            <span className="mt-4 text-xs font-bold text-success-text dark:text-success group-hover:underline">
               ดาวน์โหลด SQLite .db →
             </span>
           </a>
@@ -209,18 +209,18 @@ export function BackupClient({ lastBackupAt }: BackupClientProps) {
       </div>
 
       {/* Import / Restore Section */}
-      <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-xs dark:border-zinc-800 dark:bg-zinc-900 space-y-4">
+      <div className="rounded-2xl border border-border bg-card p-6 shadow-xs space-y-4">
         <div className="flex items-center gap-2">
-          <UploadCloud className="h-5 w-5 text-amber-500" />
-          <h2 className="text-base font-bold text-zinc-900 dark:text-zinc-100">
+          <UploadCloud className="h-5 w-5 text-warning-text dark:text-warning" />
+          <h2 className="text-base font-bold text-foreground">
             กู้คืนข้อมูล (Restore Backup)
           </h2>
         </div>
-        <p className="text-xs text-zinc-500 dark:text-zinc-400">
+        <p className="text-xs text-muted-foreground">
           นำเข้าไฟล์สำรองข้อมูล (JSON หรือ .db) ที่คุณเคยบันทึกไว้เพื่อนำข้อมูลกลับมา
         </p>
 
-        <div className="mt-2 rounded-xl border-2 border-dashed border-zinc-200 p-6 text-center dark:border-zinc-800">
+        <div className="mt-2 rounded-xl border-2 border-dashed border-border p-6 text-center">
           <input
             type="file"
             id="backup-file-input"
@@ -232,11 +232,11 @@ export function BackupClient({ lastBackupAt }: BackupClientProps) {
             htmlFor="backup-file-input"
             className="cursor-pointer flex flex-col items-center justify-center"
           >
-            <UploadCloud className="h-10 w-10 text-zinc-400 mb-2" />
-            <span className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">
+            <UploadCloud className="h-10 w-10 text-muted-foreground mb-2" />
+            <span className="text-xs font-semibold text-foreground">
               {selectedFile ? selectedFile.name : "คลิกเพื่อเลือกไฟล์ Backup (.json หรือ .db)"}
             </span>
-            <span className="text-[11px] text-zinc-400 mt-1">
+            <span className="text-[11px] text-muted-foreground mt-1">
               รองรับทั้งไฟล์ JSON Snapshot และไฟล์ SQLite (.db)
             </span>
           </label>
@@ -246,7 +246,7 @@ export function BackupClient({ lastBackupAt }: BackupClientProps) {
               <button
                 type="button"
                 onClick={() => setShowConfirmModal(true)}
-                className="flex items-center gap-2 rounded-xl bg-amber-600 px-5 py-2.5 text-xs font-bold text-white shadow-xs hover:bg-amber-700"
+                className="flex items-center gap-2 rounded-xl bg-warning px-5 py-2.5 text-xs font-bold text-warning-foreground shadow-xs hover:bg-warning-hover transition focus:outline-hidden focus:ring-2 focus:ring-warning"
               >
                 ดำเนินการกู้คืนข้อมูล (Restore)
               </button>
@@ -258,18 +258,18 @@ export function BackupClient({ lastBackupAt }: BackupClientProps) {
       {/* Confirmation Modal */}
       {showConfirmModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-xs p-4">
-          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-center">
-            <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-rose-100 text-rose-600 dark:bg-rose-950/60 dark:text-rose-400">
+          <div className="w-full max-w-md rounded-2xl bg-card p-6 shadow-2xl border border-border text-center">
+            <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-danger-subtle text-danger">
               <AlertTriangle className="h-6 w-6" />
             </div>
 
-            <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-100">
+            <h3 className="text-lg font-bold text-foreground">
               คำเตือน
             </h3>
-            <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-300 font-medium">
+            <p className="mt-2 text-sm text-foreground font-semibold">
               การ Restore จะเขียนทับข้อมูลปัจจุบัน
             </p>
-            <p className="mt-1 text-xs text-zinc-400">
+            <p className="mt-1 text-xs text-muted-foreground">
               ข้อมูลปัจจุบันทั้งหมดจะถูกแทนที่ด้วยข้อมูลจากไฟล์: <strong>{selectedFile?.name}</strong>
               <br />ต้องการดำเนินการต่อหรือไม่?
             </p>
@@ -278,7 +278,7 @@ export function BackupClient({ lastBackupAt }: BackupClientProps) {
               <button
                 type="button"
                 onClick={() => setShowConfirmModal(false)}
-                className="flex-1 rounded-xl border border-zinc-300 py-2.5 text-xs font-semibold text-zinc-700 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                className="flex-1 rounded-xl border border-border py-2.5 text-xs font-semibold text-foreground hover:bg-muted transition"
               >
                 ยกเลิก
               </button>
@@ -286,7 +286,7 @@ export function BackupClient({ lastBackupAt }: BackupClientProps) {
                 type="button"
                 disabled={loading}
                 onClick={handleConfirmRestore}
-                className="flex-1 rounded-xl bg-rose-600 py-2.5 text-xs font-semibold text-white hover:bg-rose-700 disabled:opacity-50"
+                className="flex-1 rounded-xl bg-danger py-2.5 text-xs font-semibold text-white hover:bg-danger-hover disabled:opacity-50 transition"
               >
                 {loading ? "กำลังดำเนินการ..." : "ยืนยัน Restore"}
               </button>

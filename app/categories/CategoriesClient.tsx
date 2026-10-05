@@ -19,8 +19,12 @@ const AVAILABLE_ICONS = [
 ];
 
 const AVAILABLE_COLORS = [
-  "#ef4444", "#f97316", "#f59e0b", "#eab308", "#10b981", "#06b6d4",
-  "#3b82f6", "#6366f1", "#8b5cf6", "#a855f7", "#ec4899", "#64748b"
+  "#083D77", // Primary
+  "#2A9D8F", // Success
+  "#DA4167", // Danger
+  "#F4D35E", // Warning
+  "#F78764", // Accent
+  "#3b82f6", "#6366f1", "#8b5cf6", "#ec4899", "#10b981", "#06b6d4", "#64748b"
 ];
 
 export function CategoriesClient({ categories }: CategoriesClientProps) {
@@ -101,17 +105,17 @@ export function CategoriesClient({ categories }: CategoriesClientProps) {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">
             หมวดหมู่ (Categories)
           </h1>
-          <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
+          <p className="text-xs text-muted-foreground mt-0.5">
             จัดการหมวดหมู่รายรับและรายจ่าย พร้อมกำหนดไอคอนและสี
           </p>
         </div>
 
         <button
           onClick={handleOpenAdd}
-          className="flex items-center gap-1.5 rounded-xl bg-emerald-600 px-4 py-2 text-xs font-semibold text-white shadow-xs hover:bg-emerald-700"
+          className="flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-xs hover:bg-primary-hover transition focus:outline-hidden focus:ring-2 focus:ring-primary focus:ring-offset-2"
         >
           <Plus className="h-4 w-4" />
           เพิ่มหมวดหมู่ใหม่
@@ -119,13 +123,13 @@ export function CategoriesClient({ categories }: CategoriesClientProps) {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 border-b border-zinc-200 dark:border-zinc-800">
+      <div className="flex gap-2 border-b border-border">
         <button
           onClick={() => setActiveTab("EXPENSE")}
           className={`pb-3 text-xs font-bold transition border-b-2 ${
             activeTab === "EXPENSE"
-              ? "border-rose-500 text-rose-600 dark:text-rose-400"
-              : "border-transparent text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
+              ? "border-danger text-danger"
+              : "border-transparent text-muted-foreground hover:text-foreground"
           }`}
         >
           หมวดหมู่รายจ่าย ({categories.filter((c) => c.type === "EXPENSE").length})
@@ -134,8 +138,8 @@ export function CategoriesClient({ categories }: CategoriesClientProps) {
           onClick={() => setActiveTab("INCOME")}
           className={`pb-3 text-xs font-bold transition border-b-2 ${
             activeTab === "INCOME"
-              ? "border-emerald-500 text-emerald-600 dark:text-emerald-400"
-              : "border-transparent text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
+              ? "border-success text-success-text dark:text-success"
+              : "border-transparent text-muted-foreground hover:text-foreground"
           }`}
         >
           หมวดหมู่รายรับ ({categories.filter((c) => c.type === "INCOME").length})
@@ -147,7 +151,7 @@ export function CategoriesClient({ categories }: CategoriesClientProps) {
         {filtered.map((cat) => (
           <div
             key={cat.id}
-            className="flex flex-col justify-between rounded-2xl border border-zinc-200 bg-white p-4 shadow-xs dark:border-zinc-800 dark:bg-zinc-900 group"
+            className="flex flex-col justify-between rounded-2xl border border-border bg-card p-4 shadow-xs group"
           >
             <div className="flex items-center justify-between">
               <div
@@ -160,14 +164,14 @@ export function CategoriesClient({ categories }: CategoriesClientProps) {
               <div className="flex items-center gap-1 opacity-80 group-hover:opacity-100">
                 <button
                   onClick={() => handleOpenEdit(cat)}
-                  className="rounded-lg p-1 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-600 dark:hover:bg-zinc-800"
+                  className="rounded-lg p-1 text-muted-foreground hover:bg-muted hover:text-foreground transition"
                   title="แก้ไข"
                 >
                   <Edit2 className="h-3.5 w-3.5" />
                 </button>
                 <button
                   onClick={() => handleDelete(cat.id)}
-                  className="rounded-lg p-1 text-zinc-400 hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-950/40"
+                  className="rounded-lg p-1 text-muted-foreground hover:bg-danger-subtle hover:text-danger transition"
                   title="ลบ"
                 >
                   <Trash2 className="h-3.5 w-3.5" />
@@ -176,10 +180,10 @@ export function CategoriesClient({ categories }: CategoriesClientProps) {
             </div>
 
             <div className="mt-4">
-              <h3 className="text-xs font-bold text-zinc-900 dark:text-zinc-100 truncate">
+              <h3 className="text-xs font-bold text-foreground truncate">
                 {cat.name}
               </h3>
-              <p className="mt-0.5 text-[10px] text-zinc-400">
+              <p className="mt-0.5 text-[10px] text-muted-foreground">
                 {cat._count?.transactions || 0} รายการ
               </p>
             </div>
@@ -190,14 +194,14 @@ export function CategoriesClient({ categories }: CategoriesClientProps) {
       {/* Add / Edit Category Modal */}
       {modalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 overflow-y-auto">
-          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 my-8">
-            <div className="flex items-center justify-between border-b border-zinc-100 pb-3 dark:border-zinc-800">
-              <h2 className="text-base font-bold text-zinc-900 dark:text-zinc-100">
+          <div className="w-full max-w-md rounded-2xl bg-card p-6 shadow-2xl border border-border my-8">
+            <div className="flex items-center justify-between border-b border-border pb-3">
+              <h2 className="text-base font-bold text-foreground">
                 {editingCat ? "แก้ไขหมวดหมู่" : "เพิ่มหมวดหมู่ใหม่"}
               </h2>
               <button
                 onClick={() => setModalOpen(false)}
-                className="rounded-lg p-1.5 text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground transition"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -205,7 +209,7 @@ export function CategoriesClient({ categories }: CategoriesClientProps) {
 
             <form onSubmit={handleSave} className="mt-4 space-y-4">
               <div>
-                <label className="block text-xs font-medium text-zinc-500 dark:text-zinc-400">
+                <label className="block text-xs font-medium text-muted-foreground">
                   ชื่อหมวดหมู่ *
                 </label>
                 <input
@@ -214,18 +218,18 @@ export function CategoriesClient({ categories }: CategoriesClientProps) {
                   placeholder="เช่น ค่าอาหาร, กาแฟ"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="mt-1 w-full rounded-xl border border-zinc-300 p-2.5 text-sm font-medium text-zinc-900 focus:border-emerald-500 focus:outline-hidden dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+                  className="mt-1 w-full rounded-xl border border-border bg-card p-2.5 text-sm font-medium text-foreground focus:border-primary focus:ring-1 focus:ring-primary focus:outline-hidden"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-zinc-500 dark:text-zinc-400">
+                <label className="block text-xs font-medium text-muted-foreground">
                   ประเภท *
                 </label>
                 <select
                   value={type}
                   onChange={(e) => setType(e.target.value as any)}
-                  className="mt-1 w-full rounded-xl border border-zinc-300 p-2.5 text-sm font-medium text-zinc-900 focus:border-emerald-500 focus:outline-hidden dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+                  className="mt-1 w-full rounded-xl border border-border bg-card p-2.5 text-sm font-medium text-foreground focus:border-primary focus:ring-1 focus:ring-primary focus:outline-hidden"
                 >
                   <option value="EXPENSE">รายจ่าย (Expense)</option>
                   <option value="INCOME">รายรับ (Income)</option>
@@ -233,10 +237,10 @@ export function CategoriesClient({ categories }: CategoriesClientProps) {
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-1.5">
+                <label className="block text-xs font-medium text-muted-foreground mb-1.5">
                   เลือกไอคอน
                 </label>
-                <div className="grid grid-cols-6 gap-2 max-h-36 overflow-y-auto p-1 border border-zinc-200 dark:border-zinc-800 rounded-xl">
+                <div className="grid grid-cols-6 gap-2 max-h-36 overflow-y-auto p-1 border border-border rounded-xl">
                   {AVAILABLE_ICONS.map((iName) => (
                     <button
                       key={iName}
@@ -244,8 +248,8 @@ export function CategoriesClient({ categories }: CategoriesClientProps) {
                       onClick={() => setIcon(iName)}
                       className={`flex h-10 items-center justify-center rounded-lg transition ${
                         icon === iName
-                          ? "bg-emerald-600 text-white shadow-xs"
-                          : "text-zinc-600 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                          ? "bg-primary text-primary-foreground shadow-xs"
+                          : "text-muted-foreground hover:bg-muted hover:text-foreground"
                       }`}
                     >
                       <CategoryIcon name={iName} size={18} />
@@ -255,7 +259,7 @@ export function CategoriesClient({ categories }: CategoriesClientProps) {
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-1.5">
+                <label className="block text-xs font-medium text-muted-foreground mb-1.5">
                   เลือกสี
                 </label>
                 <div className="flex flex-wrap gap-2">
@@ -265,7 +269,7 @@ export function CategoriesClient({ categories }: CategoriesClientProps) {
                       type="button"
                       onClick={() => setColor(c)}
                       className={`h-7 w-7 rounded-full transition ${
-                        color === c ? "ring-2 ring-emerald-500 ring-offset-2 scale-110" : ""
+                        color === c ? "ring-2 ring-primary ring-offset-2 scale-110" : ""
                       }`}
                       style={{ backgroundColor: c }}
                     />
@@ -277,14 +281,14 @@ export function CategoriesClient({ categories }: CategoriesClientProps) {
                 <button
                   type="button"
                   onClick={() => setModalOpen(false)}
-                  className="flex-1 rounded-xl border border-zinc-300 py-2.5 text-xs font-semibold text-zinc-700 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                  className="flex-1 rounded-xl border border-border py-2.5 text-xs font-semibold text-foreground hover:bg-muted transition"
                 >
                   ยกเลิก
                 </button>
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex-1 rounded-xl bg-emerald-600 py-2.5 text-xs font-semibold text-white hover:bg-emerald-700 disabled:opacity-50"
+                  className="flex-1 rounded-xl bg-primary py-2.5 text-xs font-semibold text-primary-foreground hover:bg-primary-hover disabled:opacity-50 transition focus:outline-hidden focus:ring-2 focus:ring-primary"
                 >
                   {loading ? "กำลังบันทึก..." : "บันทึกข้อมูล"}
                 </button>

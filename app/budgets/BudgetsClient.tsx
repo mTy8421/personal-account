@@ -115,29 +115,29 @@ export function BudgetsClient({
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">
             งบประมาณรายเดือน (Budgets)
           </h1>
-          <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
+          <p className="text-xs text-muted-foreground mt-0.5">
             กำหนดและควบคุมเพดานค่าใช้จ่ายในแต่ละหมวดหมู่
           </p>
         </div>
 
         <div className="flex items-center gap-2">
           {/* Month Navigator */}
-          <div className="flex items-center rounded-xl border border-zinc-200 bg-white p-1 dark:border-zinc-800 dark:bg-zinc-900 shadow-2xs">
+          <div className="flex items-center rounded-xl border border-border bg-card p-1 shadow-2xs">
             <button
               onClick={handlePrevMonth}
-              className="rounded-lg p-1.5 text-zinc-500 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
+              className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground transition"
             >
               <ChevronLeft className="h-4 w-4" />
             </button>
-            <span className="px-3 text-xs font-bold text-zinc-800 dark:text-zinc-200">
+            <span className="px-3 text-xs font-bold text-foreground">
               {formatThaiMonthYear(month, year)}
             </span>
             <button
               onClick={handleNextMonth}
-              className="rounded-lg p-1.5 text-zinc-500 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
+              className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground transition"
             >
               <ChevronRight className="h-4 w-4" />
             </button>
@@ -145,7 +145,7 @@ export function BudgetsClient({
 
           <button
             onClick={() => handleOpenAdd()}
-            className="flex items-center gap-1.5 rounded-xl bg-emerald-600 px-4 py-2 text-xs font-semibold text-white shadow-xs hover:bg-emerald-700"
+            className="flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-xs hover:bg-primary-hover transition focus:outline-hidden focus:ring-2 focus:ring-primary focus:ring-offset-2"
           >
             <Plus className="h-4 w-4" />
             ตั้งงบประมาณ
@@ -154,29 +154,29 @@ export function BudgetsClient({
       </div>
 
       {/* Overview Progress Card */}
-      <div className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-xs dark:border-zinc-800 dark:bg-zinc-900">
+      <div className="rounded-2xl border border-border bg-card p-5 shadow-xs">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <span className="text-xs font-medium text-zinc-400">
+            <span className="text-xs font-medium text-muted-foreground">
               ภาพรวมงบประมาณประจำ {formatThaiMonthYear(month, year)}
             </span>
             <div className="mt-1 flex items-baseline gap-2">
-              <span className="text-2xl font-black text-zinc-900 dark:text-zinc-100">
+              <span className="text-2xl font-black text-foreground">
                 {formatCurrency(totalSpent)}
               </span>
-              <span className="text-sm font-semibold text-zinc-400">
+              <span className="text-sm font-semibold text-muted-foreground">
                 / {formatCurrency(totalBudget)}
               </span>
             </div>
           </div>
 
           <div className="text-left sm:text-right">
-            <span className="text-xs font-medium text-zinc-400">งบประมาณคงเหลือรวม</span>
+            <span className="text-xs font-medium text-muted-foreground">งบประมาณคงเหลือรวม</span>
             <p
               className={`text-lg font-bold ${
                 totalRemaining >= 0
-                  ? "text-emerald-600 dark:text-emerald-400"
-                  : "text-rose-600 dark:text-rose-400"
+                  ? "text-success-text dark:text-success"
+                  : "text-danger"
               }`}
             >
               {totalRemaining >= 0
@@ -188,18 +188,18 @@ export function BudgetsClient({
 
         {/* Progress Bar */}
         <div className="mt-4">
-          <div className="flex justify-between text-xs mb-1.5 font-semibold text-zinc-500">
+          <div className="flex justify-between text-xs mb-1.5 font-semibold text-muted-foreground">
             <span>ใช้ไปแล้ว {overallPercentage}%</span>
             <span>{totalRemaining >= 0 ? `เหลืออีก ${100 - overallPercentage}%` : "เกินงบประมาณ!"}</span>
           </div>
-          <div className="h-3 w-full rounded-full bg-zinc-100 dark:bg-zinc-800 overflow-hidden">
+          <div className="h-3 w-full rounded-full bg-muted overflow-hidden">
             <div
               className={`h-full rounded-full transition-all duration-500 ${
                 overallPercentage > 100
-                  ? "bg-rose-500"
+                  ? "bg-danger"
                   : overallPercentage >= 80
-                  ? "bg-amber-500"
-                  : "bg-emerald-500"
+                  ? "bg-warning"
+                  : "bg-success"
               }`}
               style={{ width: `${Math.min(overallPercentage, 100)}%` }}
             />
@@ -209,17 +209,17 @@ export function BudgetsClient({
 
       {/* Budget Items Grid */}
       {budgets.length === 0 ? (
-        <div className="rounded-2xl border border-zinc-200 bg-white p-12 text-center shadow-xs dark:border-zinc-800 dark:bg-zinc-900">
-          <PiggyBank className="mx-auto mb-3 h-12 w-12 text-zinc-300 dark:text-zinc-700" />
-          <h3 className="text-sm font-bold text-zinc-700 dark:text-zinc-300">
+        <div className="rounded-2xl border border-border bg-card p-12 text-center shadow-xs">
+          <PiggyBank className="mx-auto mb-3 h-12 w-12 text-muted-foreground/60" />
+          <h3 className="text-sm font-bold text-foreground">
             ยังไม่ได้กำหนดงบประมาณสำหรับเดือนนี้
           </h3>
-          <p className="mt-1 text-xs text-zinc-400">
+          <p className="mt-1 text-xs text-muted-foreground">
             คลิกปุ่ม &quot;ตั้งงบประมาณ&quot; เพื่อเริ่มต้นกำหนดเป้าหมายการใช้จ่าย
           </p>
           <button
             onClick={() => handleOpenAdd()}
-            className="mt-4 inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-4 py-2 text-xs font-semibold text-white hover:bg-emerald-700"
+            className="mt-4 inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground hover:bg-primary-hover transition focus:outline-hidden focus:ring-2 focus:ring-primary"
           >
             <Plus className="h-4 w-4" />
             ตั้งงบประมาณแรก
@@ -237,21 +237,21 @@ export function BudgetsClient({
             return (
               <div
                 key={b.id}
-                className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-xs dark:border-zinc-800 dark:bg-zinc-900 relative"
+                className="rounded-2xl border border-border bg-card p-5 shadow-xs relative"
               >
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">
                     <div
                       className="flex h-10 w-10 items-center justify-center rounded-xl text-white shadow-xs"
-                      style={{ backgroundColor: b.category?.color || "#3b82f6" }}
+                      style={{ backgroundColor: b.category?.color || "#083D77" }}
                     >
                       <CategoryIcon name={b.category?.icon || "Tag"} size={20} />
                     </div>
                     <div>
-                      <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-100">
+                      <h3 className="text-sm font-bold text-foreground">
                         {b.category?.name}
                       </h3>
-                      <span className="text-[11px] text-zinc-400">
+                      <span className="text-[11px] text-muted-foreground">
                         งบประมาณ: {formatCurrency(b.amount)}
                       </span>
                     </div>
@@ -260,14 +260,14 @@ export function BudgetsClient({
                   <div className="flex items-center gap-1">
                     <button
                       onClick={() => handleOpenAdd(b)}
-                      className="rounded-lg p-1.5 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-600 dark:hover:bg-zinc-800"
+                      className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground transition"
                       title="แก้ไขงบ"
                     >
                       <Edit2 className="h-3.5 w-3.5" />
                     </button>
                     <button
                       onClick={() => handleDelete(b.id)}
-                      className="rounded-lg p-1.5 text-zinc-400 hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-950/40"
+                      className="rounded-lg p-1.5 text-muted-foreground hover:bg-danger-subtle hover:text-danger transition"
                       title="ลบงบ"
                     >
                       <Trash2 className="h-3.5 w-3.5" />
@@ -277,12 +277,12 @@ export function BudgetsClient({
 
                 {/* Status Alert Banner */}
                 {isOver ? (
-                  <div className="mt-3 flex items-center gap-2 rounded-xl bg-rose-50 p-2.5 text-xs font-semibold text-rose-600 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200 dark:border-rose-900">
+                  <div className="mt-3 flex items-center gap-2 rounded-xl bg-danger-subtle p-2.5 text-xs font-semibold text-danger-text border border-danger/30">
                     <AlertTriangle className="h-4 w-4 shrink-0" />
                     <span>⚠️ ค่า{b.category?.name}เกินงบประมาณแล้ว (+{formatCurrency(spent - b.amount)})</span>
                   </div>
                 ) : isNear ? (
-                  <div className="mt-3 flex items-center gap-2 rounded-xl bg-amber-50 p-2.5 text-xs font-semibold text-amber-700 dark:bg-amber-950/40 dark:text-amber-400 border border-amber-200 dark:border-amber-900">
+                  <div className="mt-3 flex items-center gap-2 rounded-xl bg-warning-subtle p-2.5 text-xs font-semibold text-warning-text border border-warning/40">
                     <AlertCircle className="h-4 w-4 shrink-0" />
                     <span>ใกล้ถึงเพดานงบประมาณแล้ว (ใช้ไปแล้ว {pct}%)</span>
                   </div>
@@ -291,28 +291,28 @@ export function BudgetsClient({
                 {/* Progress Detail */}
                 <div className="mt-4">
                   <div className="flex justify-between text-xs mb-1.5">
-                    <span className="font-semibold text-zinc-700 dark:text-zinc-300">
+                    <span className="font-semibold text-foreground">
                       ใช้ไปแล้ว: {formatCurrency(spent)}
                     </span>
                     <span
                       className={`font-semibold ${
                         remaining >= 0
-                          ? "text-emerald-600 dark:text-emerald-400"
-                          : "text-rose-600 dark:text-rose-400"
+                          ? "text-success-text dark:text-success"
+                          : "text-danger"
                       }`}
                     >
                       {remaining >= 0 ? `เหลือ: ${formatCurrency(remaining)}` : "เกินงบ"}
                     </span>
                   </div>
 
-                  <div className="h-2.5 w-full rounded-full bg-zinc-100 dark:bg-zinc-800 overflow-hidden">
+                  <div className="h-2.5 w-full rounded-full bg-muted overflow-hidden">
                     <div
                       className={`h-full rounded-full transition-all duration-500 ${
                         isOver
-                          ? "bg-rose-500"
+                          ? "bg-danger"
                           : isNear
-                          ? "bg-amber-500"
-                          : "bg-emerald-500"
+                          ? "bg-warning"
+                          : "bg-success"
                       }`}
                       style={{ width: `${Math.min(pct, 100)}%` }}
                     />
@@ -327,14 +327,14 @@ export function BudgetsClient({
       {/* Set Budget Modal */}
       {modalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
-          <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800">
-            <div className="flex items-center justify-between border-b border-zinc-100 pb-3 dark:border-zinc-800">
-              <h2 className="text-base font-bold text-zinc-900 dark:text-zinc-100">
+          <div className="w-full max-w-sm rounded-2xl bg-card p-6 shadow-2xl border border-border">
+            <div className="flex items-center justify-between border-b border-border pb-3">
+              <h2 className="text-base font-bold text-foreground">
                 ตั้งงบประมาณ ({formatThaiMonthYear(month, year)})
               </h2>
               <button
                 onClick={() => setModalOpen(false)}
-                className="rounded-lg p-1.5 text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground transition"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -342,14 +342,14 @@ export function BudgetsClient({
 
             <form onSubmit={handleSave} className="mt-4 space-y-4">
               <div>
-                <label className="block text-xs font-medium text-zinc-500 dark:text-zinc-400">
+                <label className="block text-xs font-medium text-muted-foreground">
                   หมวดหมู่ค่าใช้จ่าย *
                 </label>
                 <select
                   required
                   value={categoryId}
                   onChange={(e) => setCategoryId(e.target.value)}
-                  className="mt-1 w-full rounded-xl border border-zinc-300 p-2.5 text-sm font-medium text-zinc-900 focus:border-emerald-500 focus:outline-hidden dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+                  className="mt-1 w-full rounded-xl border border-border bg-card p-2.5 text-sm font-medium text-foreground focus:border-primary focus:ring-1 focus:ring-primary focus:outline-hidden"
                 >
                   {categories.map((c) => (
                     <option key={c.id} value={c.id}>
@@ -360,7 +360,7 @@ export function BudgetsClient({
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-zinc-500 dark:text-zinc-400">
+                <label className="block text-xs font-medium text-muted-foreground">
                   จำนวนงบประมาณ (บาท) *
                 </label>
                 <input
@@ -371,7 +371,7 @@ export function BudgetsClient({
                   placeholder="เช่น 5000"
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
-                  className="mt-1 w-full rounded-xl border border-zinc-300 p-2.5 text-sm font-medium text-zinc-900 focus:border-emerald-500 focus:outline-hidden dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+                  className="mt-1 w-full rounded-xl border border-border bg-card p-2.5 text-sm font-medium text-foreground focus:border-primary focus:ring-1 focus:ring-primary focus:outline-hidden"
                 />
               </div>
 
@@ -379,14 +379,14 @@ export function BudgetsClient({
                 <button
                   type="button"
                   onClick={() => setModalOpen(false)}
-                  className="flex-1 rounded-xl border border-zinc-300 py-2.5 text-xs font-semibold text-zinc-700 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                  className="flex-1 rounded-xl border border-border py-2.5 text-xs font-semibold text-foreground hover:bg-muted transition"
                 >
                   ยกเลิก
                 </button>
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex-1 rounded-xl bg-emerald-600 py-2.5 text-xs font-semibold text-white hover:bg-emerald-700 disabled:opacity-50"
+                  className="flex-1 rounded-xl bg-primary py-2.5 text-xs font-semibold text-primary-foreground hover:bg-primary-hover disabled:opacity-50 transition focus:outline-hidden focus:ring-2 focus:ring-primary"
                 >
                   {loading ? "กำลังบันทึก..." : "บันทึกงบ"}
                 </button>

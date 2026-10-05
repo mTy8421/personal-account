@@ -15,7 +15,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <PinLockGatekeeper>
-      <div className="flex min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100">
+      <div className="flex min-h-screen bg-background text-foreground">
         {/* Desktop Sidebar */}
         <Sidebar onOpenNewTransaction={handleOpenNewTransaction} />
 

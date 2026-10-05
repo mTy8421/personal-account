@@ -1,26 +1,160 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Brand Core Palette */
+  --primary: #083D77;
+  --primary-hover: #062F5C;
+  --primary-foreground: #FFFFFF;
+  --primary-subtle: #E6EFF8;
+
+  /* Backgrounds & Surfaces (Cream #EBEBD3 as main background) */
+  --background: #EBEBD3;
+  --foreground: #141B24;
+
+  /* Card Surfaces (Crisp White for contrast and visual hierarchy) */
+  --card: #FFFFFF;
+  --card-foreground: #141B24;
+  --card-muted: #F8F8F1;
+
+  /* Semantic Financial Colors */
+  --danger: #DA4167;
+  --danger-hover: #C33559;
+  --danger-foreground: #FFFFFF;
+  --danger-subtle: #FDF1F4;
+  --danger-text: #B8284E;
+
+  --warning: #F4D35E;
+  --warning-hover: #E7C44D;
+  --warning-foreground: #352802; /* Dark text for WCAG AAA compliance */
+  --warning-subtle: #FEF9EB;
+  --warning-text: #7A5B04;
+
+  --accent: #F78764;
+  --accent-hover: #E6724E;
+  --accent-foreground: #FFFFFF;
+  --accent-subtle: #FEF3EE;
+  --accent-text: #B24623;
+
+  --success: #2A9D8F;
+  --success-hover: #228479;
+  --success-foreground: #FFFFFF;
+  --success-subtle: #EDF7F6;
+  --success-text: #1B6E64; /* WCAG AA readable text (> 4.5:1) */
+
+  /* Neutral, Borders & Form Controls */
+  --border: #DEDEC4;
+  --border-subtle: #E8E8D5;
+  --input: #D4D4B8;
+  --ring: #083D77;
+
+  --muted: #E2E2CC;
+  --muted-foreground: #5B6675;
+}
+
+.dark {
+  /* Brand Core in Dark Mode */
+  --primary: #2563EB;
+  --primary-hover: #3B82F6;
+  --primary-foreground: #FFFFFF;
+  --primary-subtle: #142845;
+
+  /* Dark Mode Surfaces (Deep Navy Tinted) */
+  --background: #0B1320;
+  --foreground: #EDEDED;
+
+  --card: #131E2E;
+  --card-foreground: #EDEDED;
+  --card-muted: #1A283D;
+
+  /* Semantic Financial Colors for Dark Mode */
+  --danger: #E85D7F;
+  --danger-hover: #F27292;
+  --danger-foreground: #FFFFFF;
+  --danger-subtle: #2C141D;
+  --danger-text: #F87192;
+
+  --warning: #F7DC78;
+  --warning-hover: #FAE48C;
+  --warning-foreground: #2A2000;
+  --warning-subtle: #2C2612;
+  --warning-text: #FDE047;
+
+  --accent: #FA9D81;
+  --accent-hover: #FBAF98;
+  --accent-foreground: #2C1610;
+  --accent-subtle: #2D1A15;
+  --accent-text: #FDBA74;
+
+  --success: #38B8A6;
+  --success-hover: #48C5B3;
+  --success-foreground: #0A2623;
+  --success-subtle: #0F2724;
+  --success-text: #4DD0C0;
+
+  /* Dark Mode Borders & Form Controls */
+  --border: #22324A;
+  --border-subtle: #19273C;
+  --input: #263852;
+  --ring: #3B82F6;
+
+  --muted: #1A283D;
+  --muted-foreground: #94A3B8;
 }
 
 @theme inline {
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-subtle: var(--primary-subtle);
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-card-muted: var(--card-muted);
+
+  --color-danger: var(--danger);
+  --color-danger-hover: var(--danger-hover);
+  --color-danger-foreground: var(--danger-foreground);
+  --color-danger-subtle: var(--danger-subtle);
+  --color-danger-text: var(--danger-text);
+
+  --color-warning: var(--warning);
+  --color-warning-hover: var(--warning-hover);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-warning-subtle: var(--warning-subtle);
+  --color-warning-text: var(--warning-text);
+
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent-subtle: var(--accent-subtle);
+  --color-accent-text: var(--accent-text);
+
+  --color-success: var(--success);
+  --color-success-hover: var(--success-hover);
+  --color-success-foreground: var(--success-foreground);
+  --color-success-subtle: var(--success-subtle);
+  --color-success-text: var(--success-text);
+
+  --color-border: var(--border);
+  --color-border-subtle: var(--border-subtle);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }

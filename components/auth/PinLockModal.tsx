@@ -71,15 +71,15 @@ export function PinLockModal({ onUnlocked }: PinLockModalProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-4">
-      <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800">
+      <div className="w-full max-w-sm rounded-2xl bg-card p-6 shadow-2xl border border-border">
         <div className="flex flex-col items-center text-center">
-          <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400">
+          <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-primary-subtle text-primary">
             <Lock className="h-7 w-7" />
           </div>
-          <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
+          <h2 className="text-xl font-bold text-foreground">
             ระบบบัญชีส่วนตัว
           </h2>
-          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+          <p className="mt-1 text-sm text-muted-foreground">
             กรุณากรอกรหัส PIN เพื่อเข้าใช้งาน
           </p>
 
@@ -90,15 +90,15 @@ export function PinLockModal({ onUnlocked }: PinLockModalProps) {
                 key={index}
                 className={`h-4 w-4 rounded-full border-2 transition-all ${
                   index < pin.length
-                    ? "border-emerald-500 bg-emerald-500"
-                    : "border-zinc-300 dark:border-zinc-700 bg-transparent"
+                    ? "border-primary bg-primary scale-110"
+                    : "border-border bg-transparent"
                 }`}
               />
             ))}
           </div>
 
           {error && (
-            <p className="mb-3 text-sm font-medium text-rose-500 dark:text-rose-400">
+            <p className="mb-3 text-sm font-semibold text-danger">
               {error}
             </p>
           )}
@@ -110,7 +110,7 @@ export function PinLockModal({ onUnlocked }: PinLockModalProps) {
                 key={num}
                 type="button"
                 onClick={() => handleKeyPress(num)}
-                className="flex h-14 items-center justify-center rounded-xl bg-zinc-100 text-xl font-semibold text-zinc-800 transition active:scale-95 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-700"
+                className="flex h-14 items-center justify-center rounded-xl bg-muted text-xl font-semibold text-foreground transition active:scale-95 hover:bg-muted/80"
               >
                 {num}
               </button>
@@ -118,21 +118,21 @@ export function PinLockModal({ onUnlocked }: PinLockModalProps) {
             <button
               type="button"
               onClick={handleClear}
-              className="flex h-14 items-center justify-center rounded-xl text-sm font-medium text-zinc-500 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
+              className="flex h-14 items-center justify-center rounded-xl text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition"
             >
               ล้าง
             </button>
             <button
               type="button"
               onClick={() => handleKeyPress("0")}
-              className="flex h-14 items-center justify-center rounded-xl bg-zinc-100 text-xl font-semibold text-zinc-800 transition active:scale-95 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-700"
+              className="flex h-14 items-center justify-center rounded-xl bg-muted text-xl font-semibold text-foreground transition active:scale-95 hover:bg-muted/80"
             >
               0
             </button>
             <button
               type="button"
               onClick={handleDelete}
-              className="flex h-14 items-center justify-center rounded-xl text-zinc-600 transition active:scale-95 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800"
+              className="flex h-14 items-center justify-center rounded-xl text-muted-foreground transition active:scale-95 hover:bg-muted hover:text-foreground"
               aria-label="ลบตัวเลข"
             >
               <Delete className="h-6 w-6" />
@@ -143,7 +143,7 @@ export function PinLockModal({ onUnlocked }: PinLockModalProps) {
             type="button"
             onClick={() => handleSubmit()}
             disabled={loading || pin.length < 4}
-            className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 py-3 text-base font-semibold text-white transition hover:bg-emerald-700 disabled:opacity-50"
+            className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3 text-base font-semibold text-primary-foreground transition hover:bg-primary-hover disabled:opacity-50 shadow-sm focus:outline-hidden focus:ring-2 focus:ring-primary focus:ring-offset-2"
           >
             <ShieldCheck className="h-5 w-5" />
             {loading ? "กำลังตรวจสอบ..." : "ปลดล็อก"}
@@ -152,7 +152,7 @@ export function PinLockModal({ onUnlocked }: PinLockModalProps) {
           <button
             type="button"
             onClick={() => setShowResetConfirm(true)}
-            className="mt-4 text-xs text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
+            className="mt-4 text-xs text-muted-foreground hover:text-foreground transition"
           >
             ลืมรหัส PIN? รีเซ็ตรหัสผ่าน
           </button>
@@ -161,26 +161,26 @@ export function PinLockModal({ onUnlocked }: PinLockModalProps) {
         {/* Modal ยืนยันการรีเซ็ต PIN */}
         {showResetConfirm && (
           <div className="fixed inset-0 z-60 flex items-center justify-center bg-black/60 p-4">
-            <div className="w-full max-w-xs rounded-xl bg-white p-5 shadow-xl dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-center">
-              <AlertTriangle className="mx-auto mb-2 h-10 w-10 text-amber-500" />
-              <h3 className="font-bold text-zinc-900 dark:text-zinc-100">
+            <div className="w-full max-w-xs rounded-2xl bg-card p-5 shadow-xl border border-border text-center">
+              <AlertTriangle className="mx-auto mb-2 h-10 w-10 text-warning" />
+              <h3 className="font-bold text-foreground">
                 รีเซ็ตรหัส PIN
               </h3>
-              <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400">
+              <p className="mt-2 text-xs text-muted-foreground">
                 การรีเซ็ตจะยกเลิกการล็อกด้วย PIN และอนุญาตให้เข้าสู่ระบบได้ทันที
               </p>
               <div className="mt-4 flex gap-2">
                 <button
                   type="button"
                   onClick={() => setShowResetConfirm(false)}
-                  className="flex-1 rounded-lg border border-zinc-300 py-2 text-xs font-medium text-zinc-700 dark:border-zinc-600 dark:text-zinc-300"
+                  className="flex-1 rounded-xl border border-border py-2 text-xs font-medium text-foreground hover:bg-muted transition"
                 >
                   ยกเลิก
                 </button>
                 <button
                   type="button"
                   onClick={handleReset}
-                  className="flex-1 rounded-lg bg-rose-600 py-2 text-xs font-medium text-white hover:bg-rose-700"
+                  className="flex-1 rounded-xl bg-danger py-2 text-xs font-medium text-white hover:bg-danger-hover transition"
                 >
                   ยืนยันรีเซ็ต
                 </button>

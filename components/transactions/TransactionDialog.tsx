@@ -150,21 +150,21 @@ export function TransactionDialog({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 overflow-y-auto">
-      <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 my-8">
-        <div className="flex items-center justify-between border-b border-zinc-100 pb-4 dark:border-zinc-800">
-          <h2 className="text-lg font-bold text-zinc-900 dark:text-zinc-100">
+      <div className="w-full max-w-lg rounded-2xl bg-card p-6 shadow-2xl border border-border my-8">
+        <div className="flex items-center justify-between border-b border-border pb-4">
+          <h2 className="text-lg font-bold text-foreground">
             {editData ? "แก้ไขรายการธุรกรรม" : "เพิ่มรายการใหม่"}
           </h2>
           <button
             onClick={onClose}
-            className="rounded-lg p-1.5 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-600 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
+            className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground transition"
           >
             <X className="h-5 w-5" />
           </button>
         </div>
 
         {/* ปุ่มสลับประเภท รายจ่าย / รายรับ / โอนเงิน */}
-        <div className="mt-4 grid grid-cols-3 gap-2 rounded-xl bg-zinc-100 p-1 dark:bg-zinc-800">
+        <div className="mt-4 grid grid-cols-3 gap-2 rounded-xl bg-muted p-1">
           <button
             type="button"
             onClick={() => {
@@ -173,8 +173,8 @@ export function TransactionDialog({
             }}
             className={`flex items-center justify-center gap-1.5 rounded-lg py-2 text-sm font-semibold transition ${
               type === "EXPENSE"
-                ? "bg-rose-500 text-white shadow-xs"
-                : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
+                ? "bg-danger text-white shadow-xs"
+                : "text-muted-foreground hover:text-foreground"
             }`}
           >
             <ArrowDownRight className="h-4 w-4" />
@@ -188,8 +188,8 @@ export function TransactionDialog({
             }}
             className={`flex items-center justify-center gap-1.5 rounded-lg py-2 text-sm font-semibold transition ${
               type === "INCOME"
-                ? "bg-emerald-500 text-white shadow-xs"
-                : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
+                ? "bg-success text-white shadow-xs"
+                : "text-muted-foreground hover:text-foreground"
             }`}
           >
             <ArrowUpRight className="h-4 w-4" />
@@ -203,8 +203,8 @@ export function TransactionDialog({
             }}
             className={`flex items-center justify-center gap-1.5 rounded-lg py-2 text-sm font-semibold transition ${
               type === "TRANSFER"
-                ? "bg-blue-500 text-white shadow-xs"
-                : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
+                ? "bg-primary text-white shadow-xs"
+                : "text-muted-foreground hover:text-foreground"
             }`}
           >
             <ArrowLeftRight className="h-4 w-4" />
@@ -213,7 +213,7 @@ export function TransactionDialog({
         </div>
 
         {error && (
-          <div className="mt-4 rounded-lg bg-rose-50 p-3 text-sm text-rose-600 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200 dark:border-rose-900">
+          <div className="mt-4 rounded-xl bg-danger-subtle p-3 text-sm text-danger-text border border-danger/30">
             {error}
           </div>
         )}
@@ -221,11 +221,11 @@ export function TransactionDialog({
         <form onSubmit={handleSubmit} className="mt-4 space-y-4">
           {/* จำนวนเงิน */}
           <div>
-            <label className="block text-xs font-medium text-zinc-500 dark:text-zinc-400">
+            <label className="block text-xs font-medium text-muted-foreground">
               จำนวนเงิน (บาท) *
             </label>
             <div className="relative mt-1">
-              <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-lg font-bold text-zinc-400">
+              <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-lg font-bold text-muted-foreground">
                 ฿
               </span>
               <input
@@ -236,7 +236,7 @@ export function TransactionDialog({
                 placeholder="0.00"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
-                className="w-full rounded-xl border border-zinc-300 py-3 pl-9 pr-4 text-xl font-bold text-zinc-900 focus:border-emerald-500 focus:outline-hidden dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+                className="w-full rounded-xl border border-border bg-card py-3 pl-9 pr-4 text-xl font-bold text-foreground focus:border-primary focus:ring-1 focus:ring-primary focus:outline-hidden"
               />
             </div>
           </div>
@@ -244,14 +244,14 @@ export function TransactionDialog({
           {/* บัญชี */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-medium text-zinc-500 dark:text-zinc-400">
+              <label className="block text-xs font-medium text-muted-foreground">
                 {type === "TRANSFER" ? "จากบัญชี *" : "บัญชี *"}
               </label>
               <select
                 required
                 value={accountId}
                 onChange={(e) => setAccountId(e.target.value)}
-                className="mt-1 w-full rounded-xl border border-zinc-300 bg-white p-2.5 text-sm font-medium text-zinc-900 focus:border-emerald-500 focus:outline-hidden dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+                className="mt-1 w-full rounded-xl border border-border bg-card p-2.5 text-sm font-medium text-foreground focus:border-primary focus:ring-1 focus:ring-primary focus:outline-hidden"
               >
                 {accounts.map((acc) => (
                   <option key={acc.id} value={acc.id}>
@@ -263,14 +263,14 @@ export function TransactionDialog({
 
             {type === "TRANSFER" && (
               <div>
-                <label className="block text-xs font-medium text-zinc-500 dark:text-zinc-400">
+                <label className="block text-xs font-medium text-muted-foreground">
                   ไปยังบัญชี *
                 </label>
                 <select
                   required
                   value={toAccountId}
                   onChange={(e) => setToAccountId(e.target.value)}
-                  className="mt-1 w-full rounded-xl border border-zinc-300 bg-white p-2.5 text-sm font-medium text-zinc-900 focus:border-emerald-500 focus:outline-hidden dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+                  className="mt-1 w-full rounded-xl border border-border bg-card p-2.5 text-sm font-medium text-foreground focus:border-primary focus:ring-1 focus:ring-primary focus:outline-hidden"
                 >
                   <option value="">-- เลือกบัญชีปลายทาง --</option>
                   {accounts
@@ -288,14 +288,14 @@ export function TransactionDialog({
           {/* หมวดหมู่ (เฉพาะ Income/Expense) */}
           {type !== "TRANSFER" && (
             <div>
-              <label className="block text-xs font-medium text-zinc-500 dark:text-zinc-400">
+              <label className="block text-xs font-medium text-muted-foreground">
                 หมวดหมู่ *
               </label>
               <select
                 required
                 value={categoryId}
                 onChange={(e) => setCategoryId(e.target.value)}
-                className="mt-1 w-full rounded-xl border border-zinc-300 bg-white p-2.5 text-sm font-medium text-zinc-900 focus:border-emerald-500 focus:outline-hidden dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+                className="mt-1 w-full rounded-xl border border-border bg-card p-2.5 text-sm font-medium text-foreground focus:border-primary focus:ring-1 focus:ring-primary focus:outline-hidden"
               >
                 <option value="">-- เลือกหมวดหมู่ --</option>
                 {filteredCategories.map((cat) => (
@@ -310,7 +310,7 @@ export function TransactionDialog({
           {/* วันที่ & หมายเหตุ */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-medium text-zinc-500 dark:text-zinc-400">
+              <label className="block text-xs font-medium text-muted-foreground">
                 วันที่ *
               </label>
               <input
@@ -318,12 +318,12 @@ export function TransactionDialog({
                 required
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
-                className="mt-1 w-full rounded-xl border border-zinc-300 bg-white p-2.5 text-sm font-medium text-zinc-900 focus:border-emerald-500 focus:outline-hidden dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+                className="mt-1 w-full rounded-xl border border-border bg-card p-2.5 text-sm font-medium text-foreground focus:border-primary focus:ring-1 focus:ring-primary focus:outline-hidden"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-zinc-500 dark:text-zinc-400">
+              <label className="block text-xs font-medium text-muted-foreground">
                 หมายเหตุ / บันทึกย่อ
               </label>
               <input
@@ -331,7 +331,7 @@ export function TransactionDialog({
                 placeholder="เช่น ข้าวเที่ยง, ชานม"
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
-                className="mt-1 w-full rounded-xl border border-zinc-300 bg-white p-2.5 text-sm font-medium text-zinc-900 focus:border-emerald-500 focus:outline-hidden dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+                className="mt-1 w-full rounded-xl border border-border bg-card p-2.5 text-sm font-medium text-foreground focus:border-primary focus:ring-1 focus:ring-primary focus:outline-hidden"
               />
             </div>
           </div>
@@ -340,14 +340,14 @@ export function TransactionDialog({
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 rounded-xl border border-zinc-300 py-2.5 text-sm font-semibold text-zinc-700 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+              className="flex-1 rounded-xl border border-border py-2.5 text-sm font-semibold text-foreground hover:bg-muted transition"
             >
               ยกเลิก
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 rounded-xl bg-emerald-600 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-emerald-700 disabled:opacity-50"
+              className="flex-1 rounded-xl bg-primary py-2.5 text-sm font-semibold text-primary-foreground shadow-xs hover:bg-primary-hover disabled:opacity-50 transition focus:outline-hidden focus:ring-2 focus:ring-primary focus:ring-offset-2"
             >
               {loading ? "กำลังบันทึก..." : editData ? "บันทึกการแก้ไข" : "บันทึกรายการ"}
             </button>

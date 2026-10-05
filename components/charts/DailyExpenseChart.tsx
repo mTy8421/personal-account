@@ -21,9 +21,9 @@ interface DailyExpenseChartProps {
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     return (
-      <div className="rounded-xl bg-white p-3 shadow-lg border border-zinc-200 dark:bg-zinc-800 dark:border-zinc-700">
-        <p className="text-xs text-zinc-500 mb-0.5">วันที่ {label}</p>
-        <p className="text-sm font-bold text-rose-600 dark:text-rose-400">
+      <div className="rounded-xl bg-card p-3 shadow-lg border border-border">
+        <p className="text-xs text-muted-foreground mb-0.5">วันที่ {label}</p>
+        <p className="text-sm font-bold text-danger">
           {formatCurrency(payload[0].value)}
         </p>
       </div>
@@ -40,7 +40,7 @@ export function DailyExpenseChart({ data }: DailyExpenseChartProps) {
   }, []);
 
   if (!mounted) {
-    return <div className="h-64 w-full animate-pulse rounded-xl bg-zinc-100 dark:bg-zinc-800" />;
+    return <div className="h-64 w-full animate-pulse rounded-xl bg-muted" />;
   }
 
   return (
@@ -60,7 +60,7 @@ export function DailyExpenseChart({ data }: DailyExpenseChartProps) {
             tickFormatter={(val) => `${val >= 1000 ? `${(val / 1000).toFixed(0)}k` : val}`}
           />
           <Tooltip content={<CustomTooltip />} />
-          <Bar dataKey="amount" fill="#f43f5e" radius={[4, 4, 0, 0]} maxBarSize={20} />
+          <Bar dataKey="amount" fill="#DA4167" radius={[4, 4, 0, 0]} maxBarSize={20} />
         </BarChart>
       </ResponsiveContainer>
     </div>

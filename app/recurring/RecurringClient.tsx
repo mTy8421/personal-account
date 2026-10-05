@@ -141,17 +141,17 @@ export function RecurringClient({
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">
             ค่าใช้จ่ายประจำ (Recurring Expenses)
           </h1>
-          <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
+          <p className="text-xs text-muted-foreground mt-0.5">
             จัดการบิลและรายการที่ต้องชำระซ้ำ เช่น ค่าห้อง, บิลค่าไฟ, Netflix
           </p>
         </div>
 
         <button
           onClick={() => handleOpenAdd()}
-          className="flex items-center gap-1.5 rounded-xl bg-emerald-600 px-4 py-2 text-xs font-semibold text-white shadow-xs hover:bg-emerald-700"
+          className="flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-xs hover:bg-primary-hover transition focus:outline-hidden focus:ring-2 focus:ring-primary focus:ring-offset-2"
         >
           <Plus className="h-4 w-4" />
           เพิ่มรายการประจำ
@@ -159,7 +159,7 @@ export function RecurringClient({
       </div>
 
       {message && (
-        <div className="flex items-center gap-2 rounded-xl bg-emerald-50 p-3 text-xs font-medium text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
+        <div className="flex items-center gap-2 rounded-xl bg-success-subtle p-3 text-xs font-semibold text-success-text border border-success/30">
           <CheckCircle2 className="h-4 w-4 shrink-0" />
           {message}
         </div>
@@ -167,17 +167,17 @@ export function RecurringClient({
 
       {/* Recurring Cards */}
       {recurringExpenses.length === 0 ? (
-        <div className="rounded-2xl border border-zinc-200 bg-white p-12 text-center shadow-xs dark:border-zinc-800 dark:bg-zinc-900">
-          <CalendarClock className="mx-auto mb-3 h-12 w-12 text-zinc-300 dark:text-zinc-700" />
-          <h3 className="text-sm font-bold text-zinc-700 dark:text-zinc-300">
+        <div className="rounded-2xl border border-border bg-card p-12 text-center shadow-xs">
+          <CalendarClock className="mx-auto mb-3 h-12 w-12 text-muted-foreground/60" />
+          <h3 className="text-sm font-bold text-foreground">
             ยังไม่มีรายการค่าใช้จ่ายประจำ
           </h3>
-          <p className="mt-1 text-xs text-zinc-400">
+          <p className="mt-1 text-xs text-muted-foreground">
             เพิ่มบิลหรือค่าบริการรายเดือน เพื่อให้ระบบเตือนและบันทึกรายการได้ในคลิกเดียว
           </p>
           <button
             onClick={() => handleOpenAdd()}
-            className="mt-4 inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-4 py-2 text-xs font-semibold text-white hover:bg-emerald-700"
+            className="mt-4 inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground hover:bg-primary-hover transition focus:outline-hidden focus:ring-2 focus:ring-primary"
           >
             <Plus className="h-4 w-4" />
             เพิ่มรายการแรก
@@ -192,22 +192,22 @@ export function RecurringClient({
             return (
               <div
                 key={item.id}
-                className="flex flex-col justify-between rounded-2xl border border-zinc-200 bg-white p-5 shadow-xs dark:border-zinc-800 dark:bg-zinc-900"
+                className="flex flex-col justify-between rounded-2xl border border-border bg-card p-5 shadow-xs"
               >
                 <div>
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
                       <div
                         className="flex h-11 w-11 items-center justify-center rounded-xl text-white shadow-xs"
-                        style={{ backgroundColor: item.category?.color || "#3b82f6" }}
+                        style={{ backgroundColor: item.category?.color || "#083D77" }}
                       >
                         <CategoryIcon name={item.category?.icon || "Tag"} size={22} />
                       </div>
                       <div>
-                        <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-100">
+                        <h3 className="text-sm font-bold text-foreground">
                           {item.name}
                         </h3>
-                        <div className="flex items-center gap-1.5 mt-0.5 text-[11px] text-zinc-400">
+                        <div className="flex items-center gap-1.5 mt-0.5 text-[11px] text-muted-foreground">
                           <span>{item.category?.name}</span>
                           <span>•</span>
                           <span>ตัดผ่าน: {item.account?.name}</span>
@@ -218,14 +218,14 @@ export function RecurringClient({
                     <div className="flex items-center gap-1">
                       <button
                         onClick={() => handleOpenAdd(item)}
-                        className="rounded-lg p-1.5 text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                        className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground transition"
                         title="แก้ไข"
                       >
                         <Edit2 className="h-3.5 w-3.5" />
                       </button>
                       <button
                         onClick={() => handleDelete(item.id)}
-                        className="rounded-lg p-1.5 text-zinc-400 hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-950/40"
+                        className="rounded-lg p-1.5 text-muted-foreground hover:bg-danger-subtle hover:text-danger transition"
                         title="ลบ"
                       >
                         <Trash2 className="h-3.5 w-3.5" />
@@ -235,13 +235,13 @@ export function RecurringClient({
 
                   <div className="mt-4 flex items-baseline justify-between">
                     <div>
-                      <span className="text-[11px] text-zinc-400">จำนวนเงิน</span>
-                      <p className="text-xl font-black text-rose-600 dark:text-rose-400">
+                      <span className="text-[11px] text-muted-foreground">จำนวนเงิน</span>
+                      <p className="text-xl font-black text-danger">
                         -{formatCurrency(item.amount)}
                       </p>
                     </div>
 
-                    <span className="rounded-md bg-zinc-100 px-2 py-1 text-[11px] font-medium text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300">
+                    <span className="rounded-md bg-muted px-2 py-1 text-[11px] font-medium text-foreground">
                       {item.frequency === "MONTHLY"
                         ? `ทุกวันที่ ${item.dayOfMonth || 1} ของเดือน`
                         : item.frequency === "DAILY"
@@ -253,12 +253,12 @@ export function RecurringClient({
                   </div>
                 </div>
 
-                <div className="mt-5 flex items-center justify-between border-t border-zinc-100 pt-3 dark:border-zinc-800">
+                <div className="mt-5 flex items-center justify-between border-t border-border pt-3">
                   <div className="flex items-center gap-1.5 text-xs">
-                    <span className="text-zinc-400">ครบกำหนด:</span>
+                    <span className="text-muted-foreground">ครบกำหนด:</span>
                     <span
                       className={`font-semibold ${
-                        isDue ? "text-rose-500 animate-pulse" : "text-zinc-700 dark:text-zinc-300"
+                        isDue ? "text-danger animate-pulse" : "text-foreground"
                       }`}
                     >
                       {formatThaiDate(item.nextDueDate)}
@@ -268,7 +268,7 @@ export function RecurringClient({
                   <button
                     onClick={() => handleProcess(item.id)}
                     disabled={processingId === item.id}
-                    className="flex items-center gap-1.5 rounded-xl bg-zinc-900 px-3 py-1.5 text-xs font-semibold text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 disabled:opacity-50"
+                    className="flex items-center gap-1.5 rounded-xl bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground hover:bg-primary-hover disabled:opacity-50 transition shadow-xs focus:outline-hidden focus:ring-2 focus:ring-primary"
                   >
                     <Play className="h-3.5 w-3.5 fill-current" />
                     {processingId === item.id ? "กำลังบันทึก..." : "บันทึกรายการนี้ทันที"}
@@ -283,14 +283,14 @@ export function RecurringClient({
       {/* Add / Edit Modal */}
       {modalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 overflow-y-auto">
-          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 my-8">
-            <div className="flex items-center justify-between border-b border-zinc-100 pb-3 dark:border-zinc-800">
-              <h2 className="text-base font-bold text-zinc-900 dark:text-zinc-100">
+          <div className="w-full max-w-md rounded-2xl bg-card p-6 shadow-2xl border border-border my-8">
+            <div className="flex items-center justify-between border-b border-border pb-3">
+              <h2 className="text-base font-bold text-foreground">
                 {editingItem ? "แก้ไขรายการประจำ" : "เพิ่มรายการค่าใช้จ่ายประจำ"}
               </h2>
               <button
                 onClick={() => setModalOpen(false)}
-                className="rounded-lg p-1.5 text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground transition"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -298,7 +298,7 @@ export function RecurringClient({
 
             <form onSubmit={handleSave} className="mt-4 space-y-4">
               <div>
-                <label className="block text-xs font-medium text-zinc-500 dark:text-zinc-400">
+                <label className="block text-xs font-medium text-muted-foreground">
                   ชื่อรายการประจำ *
                 </label>
                 <input
@@ -307,12 +307,12 @@ export function RecurringClient({
                   placeholder="เช่น ค่าเช่าห้อง, ค่าอินเทอร์เน็ต, Netflix"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="mt-1 w-full rounded-xl border border-zinc-300 p-2.5 text-sm font-medium text-zinc-900 focus:border-emerald-500 focus:outline-hidden dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+                  className="mt-1 w-full rounded-xl border border-border bg-card p-2.5 text-sm font-medium text-foreground focus:border-primary focus:ring-1 focus:ring-primary focus:outline-hidden"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-zinc-500 dark:text-zinc-400">
+                <label className="block text-xs font-medium text-muted-foreground">
                   จำนวนเงิน (บาท) *
                 </label>
                 <input
@@ -322,20 +322,20 @@ export function RecurringClient({
                   placeholder="0.00"
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
-                  className="mt-1 w-full rounded-xl border border-zinc-300 p-2.5 text-sm font-medium text-zinc-900 focus:border-emerald-500 focus:outline-hidden dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+                  className="mt-1 w-full rounded-xl border border-border bg-card p-2.5 text-sm font-medium text-foreground focus:border-primary focus:ring-1 focus:ring-primary focus:outline-hidden"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-zinc-500 dark:text-zinc-400">
+                  <label className="block text-xs font-medium text-muted-foreground">
                     หมวดหมู่ *
                   </label>
                   <select
                     required
                     value={categoryId}
                     onChange={(e) => setCategoryId(e.target.value)}
-                    className="mt-1 w-full rounded-xl border border-zinc-300 p-2.5 text-sm font-medium text-zinc-900 focus:border-emerald-500 focus:outline-hidden dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+                    className="mt-1 w-full rounded-xl border border-border bg-card p-2.5 text-sm font-medium text-foreground focus:border-primary focus:ring-1 focus:ring-primary focus:outline-hidden"
                   >
                     {categories.map((c) => (
                       <option key={c.id} value={c.id}>
@@ -346,14 +346,14 @@ export function RecurringClient({
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-zinc-500 dark:text-zinc-400">
+                  <label className="block text-xs font-medium text-muted-foreground">
                     ตัดจากบัญชี *
                   </label>
                   <select
                     required
                     value={accountId}
                     onChange={(e) => setAccountId(e.target.value)}
-                    className="mt-1 w-full rounded-xl border border-zinc-300 p-2.5 text-sm font-medium text-zinc-900 focus:border-emerald-500 focus:outline-hidden dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+                    className="mt-1 w-full rounded-xl border border-border bg-card p-2.5 text-sm font-medium text-foreground focus:border-primary focus:ring-1 focus:ring-primary focus:outline-hidden"
                   >
                     {accounts.map((a) => (
                       <option key={a.id} value={a.id}>
@@ -366,13 +366,13 @@ export function RecurringClient({
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-zinc-500 dark:text-zinc-400">
+                  <label className="block text-xs font-medium text-muted-foreground">
                     ความถี่ *
                   </label>
                   <select
                     value={frequency}
                     onChange={(e) => setFrequency(e.target.value)}
-                    className="mt-1 w-full rounded-xl border border-zinc-300 p-2.5 text-sm font-medium text-zinc-900 focus:border-emerald-500 focus:outline-hidden dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+                    className="mt-1 w-full rounded-xl border border-border bg-card p-2.5 text-sm font-medium text-foreground focus:border-primary focus:ring-1 focus:ring-primary focus:outline-hidden"
                   >
                     <option value="MONTHLY">รายเดือน (Monthly)</option>
                     <option value="DAILY">รายวัน (Daily)</option>
@@ -383,7 +383,7 @@ export function RecurringClient({
 
                 {frequency === "MONTHLY" && (
                   <div>
-                    <label className="block text-xs font-medium text-zinc-500 dark:text-zinc-400">
+                    <label className="block text-xs font-medium text-muted-foreground">
                       ทุกวันที่ (1-31)
                     </label>
                     <input
@@ -392,14 +392,14 @@ export function RecurringClient({
                       max="31"
                       value={dayOfMonth}
                       onChange={(e) => setDayOfMonth(e.target.value)}
-                      className="mt-1 w-full rounded-xl border border-zinc-300 p-2.5 text-sm font-medium text-zinc-900 focus:border-emerald-500 focus:outline-hidden dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+                      className="mt-1 w-full rounded-xl border border-border bg-card p-2.5 text-sm font-medium text-foreground focus:border-primary focus:ring-1 focus:ring-primary focus:outline-hidden"
                     />
                   </div>
                 )}
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-zinc-500 dark:text-zinc-400">
+                <label className="block text-xs font-medium text-muted-foreground">
                   วันครบกำหนดถัดไป *
                 </label>
                 <input
@@ -407,7 +407,7 @@ export function RecurringClient({
                   required
                   value={nextDueDate}
                   onChange={(e) => setNextDueDate(e.target.value)}
-                  className="mt-1 w-full rounded-xl border border-zinc-300 p-2.5 text-sm font-medium text-zinc-900 focus:border-emerald-500 focus:outline-hidden dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+                  className="mt-1 w-full rounded-xl border border-border bg-card p-2.5 text-sm font-medium text-foreground focus:border-primary focus:ring-1 focus:ring-primary focus:outline-hidden"
                 />
               </div>
 
@@ -415,14 +415,14 @@ export function RecurringClient({
                 <button
                   type="button"
                   onClick={() => setModalOpen(false)}
-                  className="flex-1 rounded-xl border border-zinc-300 py-2.5 text-xs font-semibold text-zinc-700 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                  className="flex-1 rounded-xl border border-border py-2.5 text-xs font-semibold text-foreground hover:bg-muted transition"
                 >
                   ยกเลิก
                 </button>
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex-1 rounded-xl bg-emerald-600 py-2.5 text-xs font-semibold text-white hover:bg-emerald-700 disabled:opacity-50"
+                  className="flex-1 rounded-xl bg-primary py-2.5 text-xs font-semibold text-primary-foreground hover:bg-primary-hover disabled:opacity-50 transition focus:outline-hidden focus:ring-2 focus:ring-primary"
                 >
                   {loading ? "กำลังบันทึก..." : "บันทึกรายการ"}
                 </button>
