@@ -1,0 +1,112 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Account {
+  id             String        @id @default(cuid())
+  name           String
+  type           String        // CASH, BANK, WALLET, CREDIT_CARD, INVESTMENT, OTHER
+  initialBalance Float         @default(0)
+  currentBalance Float         @default(0)
+  currency       String        @default("THB")
+  color          String?       @default("#3b82f6")
+  isActive       Boolean       @default(true)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  transactions         Transaction[]      @relation("AccountTransactions")
+  transferTransactions Transaction[]      @relation("TransferToAccount")
+  recurringExpenses    RecurringExpense[]
+}
+
+model Category {
+  id        String   @id @default(cuid())
+  name      String
+  type      String   // INCOME, EXPENSE
+  icon      String   @default("Tag")
+  color     String   @default("#64748b")
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  transactions      Transaction[]
+  budgets           Budget[]
+  recurringExpenses RecurringExpense[]
+}
+
+model Transaction {
+  id          String    @id @default(cuid())
+  accountId   String
+  account     Account   @relation("AccountTransactions", fields: [accountId], references: [id], onDelete: Cascade)
+  
+  toAccountId String?
+  toAccount   Account?  @relation("TransferToAccount", fields: [toAccountId], references: [id], onDelete: SetNull)
+
+  categoryId  String?
+  category    Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  type        String    // INCOME, EXPENSE, TRANSFER
+  amount      Float
+  date        DateTime
+  note        String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([accountId])
+  @@index([categoryId])
+  @@index([date])
+  @@index([type])
+}
+
+model Budget {
+  id         String   @id @default(cuid())
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  amount     Float
+  month      Int      // 1 - 12
+  year       Int      // e.g. 2026
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([categoryId, month, year])
+  @@index([year, month])
+}
+
+model RecurringExpense {
+  id           String    @id @default(cuid())
+  name         String
+  amount       Float
+  type         String    @default("EXPENSE") // EXPENSE, INCOME
+  categoryId   String
+  category     Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  accountId    String
+  account      Account   @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  frequency    String    @default("MONTHLY") // DAILY, WEEKLY, MONTHLY, YEARLY
+  dayOfMonth   Int?      @default(1)
+  dayOfWeek    Int?
+  lastRunDate  DateTime?
+  nextDueDate  DateTime
+  isActive     Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([isActive])
+  @@index([nextDueDate])
+}
+
+model AppConfig {
+  id           String    @id @default("default")
+  isPinEnabled Boolean   @default(false)
+  pinHash      String?
+  pinSalt      String?
+  currency     String    @default("THB")
+  theme        String    @default("system")
+  lastBackupAt DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}

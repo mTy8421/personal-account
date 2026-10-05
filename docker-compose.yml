@@ -1,0 +1,15 @@
+services:
+  personal-expense-tracker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: personal-expense-tracker
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=file:/app/data/database.db
+      - APP_SECRET=local-personal-expense-tracker-docker-secret-2026
+      - NODE_ENV=production
+    volumes:
+      - ./data:/app/data
